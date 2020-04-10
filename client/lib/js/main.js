@@ -1,5 +1,7 @@
 "use strict";
 
+const connection = new Connection("localhost", 8080);
+
 const Board = {
 	Width: 1000,
 	Height: 600,
@@ -37,7 +39,7 @@ const game = {
 	state: "title",
 
 	loop: function () {
-		
+
 
 		switch (this.state) {
 			case "title": {
