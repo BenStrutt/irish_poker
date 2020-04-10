@@ -1,5 +1,7 @@
 "use strict";
 
+const connection = new Connection("localhost", 8080);
+
 const Board = {
 	Width: 1000,
 	Height: 600,
@@ -39,10 +41,15 @@ const game = {
 				return guess === card.color;
 			}
 
+<<<<<<< HEAD:js/main.js
 			cards.push(card);
 			this.outcome(penalty, evaluation, player);
 		}
 	},
+=======
+	loop: function () {
+
+>>>>>>> fa3dce224ed8e00fbdd5eddd651d411dd7bda7b0:client/lib/js/main.js
 
 	round2: function () {
 		const penalty = 4;
