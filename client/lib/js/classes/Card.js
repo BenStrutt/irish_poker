@@ -11,7 +11,7 @@ Card.prototype.setRank = function (value) {
 	if (value < 11) { return value; }
 
 	const faceCards = ["jack", "queen", "king", "ace"];
-	index = value - 11;
+	const index = value - 11;
 	return faceCards[index];
 };
 

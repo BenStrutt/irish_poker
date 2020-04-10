@@ -18,7 +18,6 @@ canvas.style.backgroundColor = "#277a2b";
 document.body.appendChild(canvas);
 
 document.addEventListener("keydown", handleKeyDown);
-document.addEventListener("keyup", handleKeyUp);
 
 let keyDown;
 
@@ -41,15 +40,10 @@ const game = {
 				return guess === card.color;
 			}
 
-<<<<<<< HEAD:js/main.js
 			cards.push(card);
 			this.outcome(penalty, evaluation, player);
 		}
 	},
-=======
-	loop: function () {
-
->>>>>>> fa3dce224ed8e00fbdd5eddd651d411dd7bda7b0:client/lib/js/main.js
 
 	round2: function () {
 		const penalty = 4;
@@ -109,5 +103,3 @@ const game = {
 
 const players = [new Player("Chris"), new Player("Ben")];
 const deck = new Deck();
-
-game.loop();
