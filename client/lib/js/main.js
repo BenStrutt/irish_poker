@@ -25,16 +25,16 @@ canvas.style.backgroundColor = "#277a2b";
 document.body.appendChild(canvas);
 
 document.addEventListener("keydown", (e) => {
-    const code = e.keyCode;
-    if (code === 8) {
-        if (name.current.length) {
-            name.current = name.current.slice(0, -1);
-        }
-    } else if (code === 32 || code >= 65 && code <= 90) {
-        if (name.current.length < 40) { name.current += e.key; };
-    } else if (code === 13) {
-        processInput();
-    }
+		const code = e.keyCode;
+		if (code === 8) {
+				if (name.current.length) {
+						name.current = name.current.slice(0, -1);
+				}
+		} else if (code === 32 || code >= 65 && code <= 90) {
+				if (name.current.length < 40) { name.current += e.key; };
+		} else if (code === 13) {
+				processInput();
+		}
 });
 
 const game = {
