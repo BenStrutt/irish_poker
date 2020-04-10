@@ -26,10 +26,7 @@ function Connection(ip, port) {
 Connection.prototype.connect = (id, data) => console.log(`No connect method set: ${JSON.stringify({id: id, data: data})}`);
 Connection.prototype.disconnect = (id, data) => console.log(`No disconnect method set: ${JSON.stringify({id: id, data: data})}`);
 Connection.prototype.reconnect = (id, data) => console.log(`No reconnect method set: ${JSON.stringify({id: id, data: data})}`);
-Connection.prototype.receiveMessage = (id, data) => {
-	console.log(`No receiveMessage method set: ${JSON.stringify({id: id, data: data})}`);
-	return true;
-};
+Connection.prototype.receiveMessage = (id, data) => console.log(`No receiveMessage method set: ${JSON.stringify({id: id, data: data})}`);
 
 Connection.prototype.initialize = function (ws, req) {
 	const data = this.processSocketRequest(ws, req);
@@ -92,7 +89,7 @@ Connection.prototype.message = function (id, data) {
 		info: {id: id, data: JSON.parse(data)},
 	};
 
-	if (!this.receiveMessage(id, message.info.data)) { return; }
+	this.receiveMessage(id, message.info.data);
 	this.broadcast(message);
 };
 
