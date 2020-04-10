@@ -19,7 +19,6 @@ document.addEventListener("keydown", handleKeyDown);
 document.addEventListener("keyup", handleKeyUp);
 
 let keyDown;
-let keyUp;
 
 function handleKeyDown(data) {
 	data.preventDefault();
@@ -27,37 +26,81 @@ function handleKeyDown(data) {
 	keyDown = data.code;
 }
 
-function handleKeyUp(data) {
-	data.preventDefault();
-
-	keyUp = data.code;
-}
-
 const game = {
-	state: "title",
+	round1: function () {
+		const penalty = 2;
 
-	loop: function () {
-		
+		for (let i = 0; i < players.length; i++) {
+			const player = players[i];
+			const cards = player.cards;
+			const guess = player.guessColor();
+			const card = deck.drawCard();
+			const evaluation = function (player) {
+				return guess === card.color;
+			}
 
-		switch (this.state) {
-			case "title": {
-				titleScreen.loop();
-				break;
-			}
-			case "main": {
-				this.mainScreen();
-				break;
-			}
-			case "restart": {
-				this.restartScreen();
-				break;
-			}
+			cards.push(card);
+			this.outcome(penalty, evaluation, player);
 		}
 	},
 
-	titleScreen: {
+	round2: function () {
+		const penalty = 4;
 
+		for (let i = 0; i < players.length; i++) {
+			const player = players[i];
+			const cards = player.cards;
+			const guess = player.guessHighLow();
+			const card = deck.drawCard();
+			const evaluation = function (player) {
+				return guess === player.evalHighLow();
+			}
+
+			cards.push(card);
+			this.outcome(penalty, evaluation, player);
+		}
 	},
-}
+
+	round3: function () {
+		const penalty = 6;
+
+		for (let i = 0; i < players.length; i++) {
+			const player = players[i];
+			const cards = player.cards;
+			const guess = player.guessInsideOutside();
+			const card = deck.drawCard();
+			const evaluation = function (player) {
+				return guess === player.evalInsideOutside();
+			}
+
+			cards.push(card);
+			this.outcome(penalty, evaluation, player);
+		}
+	},
+
+	round4: function () {
+		const penalty = 8;
+
+		for (let i = 0; i < players.length; i++) {
+			const player = players[i];
+			const cards = player.cards;
+			const guess = player.guessSuit();
+			const card = deck.drawCard();
+			const evaluation = function (player) {
+				return guess === card.suit;
+			}
+
+			cards.push(card);
+			this.outcome(penalty, evaluation, player);
+		}
+	},
+
+	outcome: function (penalty, evaluation, player) {
+		evaluation(player) ? player.gives(penalty) : player.takes(penalty);
+	}
+};
+
+const players = [new Player("Chris"), new Player("Ben")];
+const deck = new Deck();
 
 game.loop();
