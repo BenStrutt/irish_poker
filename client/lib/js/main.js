@@ -87,6 +87,7 @@ const game = {
 
 function processInput() {
 	player.name = name.current;
+	player.state = "lobby";
 }
 
 const process = {
@@ -109,4 +110,7 @@ const name = new Prompt("Name");
 name.x = Board.Width * 0.5;
 name.y = Board.Height * 0.5;
 
-// process.loop();
+const player = new Player();
+player.state = "title";
+
+process.loop();
