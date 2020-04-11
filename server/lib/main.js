@@ -17,10 +17,12 @@ function connect(id, data) {
 	if (game.state === "lobby") {
 		if (game.players[id] === undefined) {
 			game.players[id] = new Player();
-		} else {
-			game.players[id].active = true;
+			game.players[id].positionX = ((id % 5) * 240) + 15;
+			game.players[id].positionY = (Math.floor(id / 5) * 300) + 20;
 		}
 	}
+
+	game.players[id].active = true;
 
 	data.state = game.state;
 	data.players = game.players;
@@ -40,6 +42,16 @@ function receiveMessage(id, data) {
 		}
 		case "round1": {
 			game.state = "round1";
+			game.turn = "0";
+			
+			for (const id in game.players) {
+				const player = game.players[id];
+				player.cards.push(game.deck.drawCard());
+				player.cards[0].x = player.positionX;
+				player.cards[0].y = player.positionY + 15;
+			}
+
+			data.players = game.players;
 			console.log("game started");
 			break;
 		}
@@ -49,4 +61,5 @@ function receiveMessage(id, data) {
 const game = {
 	state: "lobby",
 	players: {},
+	deck: new Deck(),
 };

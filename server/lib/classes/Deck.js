@@ -1,5 +1,7 @@
 "use strict"
 
+const Card = require("./Card");
+
 function Deck() {
 	this.initialize();
 }
@@ -24,10 +26,10 @@ Deck.prototype.populateCards = function () {
 
 Deck.prototype.drawCard = function () {
 	const deck = this.deck;
-	const index = Math.floor(Math.random() * deck.length);
-	const card = deck[index];
+	const index = Math.floor(Math.random() * this.cards.length);
+	const card = this.cards[index];
 
-	deck.splice(index, 1);
+	this.cards.splice(index, 1);
 	return card;
 }
 

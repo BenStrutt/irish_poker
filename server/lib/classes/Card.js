@@ -5,6 +5,7 @@ function Card(suit, value) {
 	this.value = value;
 	this.color = this.setColor(suit);
 	this.rank = this.setRank(value);
+	this.faceUp = false;
 }
 
 Card.prototype.setRank = function (value) {

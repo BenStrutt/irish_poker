@@ -1,18 +1,29 @@
 "use strict";
 
-// const assets = new Assets();
+const assets = new Assets();
 // assets.load(ASSET_DATA, render);
 
-// function render() {
-// 	const cardClubs2 = new Card();
-// 	cardClubs2.deserialize({suit: "hearts", value: 13});
-// 	const cardUnknown = new Card();
-//
-// 	cardUnknown.x = 300;
-//
-// 	cardClubs2.render(context);
-// 	cardUnknown.render(context);
-// }
+function renderCards() {
+	const players = game.players;
+
+	for (const id in players) {
+		if (players[id].active === false || players[id].cards.length === 0) { continue; }
+
+		for (let i = 0; i < players[id].cards.length; i++) {
+			players[id].cards[i].render(context);
+		}
+	}
+
+	//
+	// const cardClubs2 = new Card();
+	// cardClubs2.deserialize({suit: "hearts", value: 13});
+	// const cardUnknown = new Card();
+	//
+	// cardUnknown.x = 300;
+	//
+	// cardClubs2.render(context);
+	// cardUnknown.render(context);
+}
 
 const connection = new Connection("localhost", 8080);
 
@@ -29,6 +40,9 @@ function connect(id, data) {
 			player.deserialize(data.players[id]);
 			players[id] = player;
 		}
+
+		game.state = data.state;
+
 		return;
 	}
 
@@ -58,15 +72,29 @@ function receiveMessage(id, data) {
 			break;
 		}
 		case "round1": {
-			game.state = "round1"
+			game.state = "round1";
+			game.turn = "0";
+			for (const id in data.players) {
+				const player = new Player();
+				player.deserialize(data.players[id]);
+
+				for (let i = 0; i < player.cards.length; i++) {
+					const card = new Card();
+					card.deserialize(player.cards[i]);
+					player.cards[i] = card;
+				}
+
+				game.players[id] = player;
+			}
 			context.clearRect(0, 0, Board.Width, Board.Height)
+			renderTable();
 			break;
 		}
 	}
 }
 
 const Board = {
-	Width: 1000,
+	Width: 1200,
 	Height: 600,
 }
 
@@ -110,9 +138,24 @@ function handleClick(e) {
 }
 
 const game = {
-	state: "lobby",
+	state: null,
 	players: {},
 };
+
+function renderTable() {
+	context.font = "15px Helvetica";
+
+	for (const id in game.players) {
+		const player = game.players[id];
+
+		if (player.active === false) { continue; }
+
+		context.fillStyle = (id === game.turn) ? "#FF0" : "#FFF";
+		context.fillText(player.name, player.positionX, player.positionY);
+
+		assets.load(ASSET_DATA, renderCards);
+	}
+}
 
 const process = {
 	time: 0,
@@ -129,9 +172,9 @@ const process = {
 			this.renderPlayerList();
 		};
 
-		// if (game.state === "round1") {
-		// 	this.renderTable();
-		// }
+		if (game.state === "round1") {
+			
+		}
 	},
 
 	renderPlayerList: function () {
@@ -149,15 +192,13 @@ const process = {
 		y += 20;
 		for (const id in game.players) {
 			const player = game.players[id];
+
 			if (player.active === false || player.name === null) { continue; }
+
 			context.fillText(player.name, x, y);
 			y += 20;
 		}
 	},
-
-	// renderTable: function () {
-	//
-	// },
 };
 
 const name = new Prompt("Name");

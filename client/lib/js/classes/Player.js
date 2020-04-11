@@ -12,6 +12,8 @@ Player.prototype.deserialize = function(data) {
 	this.totalDrinks = data.totalDrinks;
 	this.name = data.name;
 	this.active = data.active;
+	this.positionX = data.positionX;
+	this.positionY = data.positionY;
 }
 
 Player.prototype.takes = function (penalty) {

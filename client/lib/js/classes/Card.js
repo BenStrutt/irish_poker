@@ -11,6 +11,9 @@ function Card() {
 Card.prototype.deserialize = function (data) {
 	this.suit = data.suit;
 	this.value = data.value;
+	this.faceUp = data.faceUp;
+	this.x = data.x;
+	this.y = data.y;
 };
 
 Card.prototype.getRank = function () {
@@ -30,7 +33,7 @@ Card.prototype.getColor = function () {
 Card.prototype.render = function (context) {
 	const value = this.value;
 	let spriteKey;
-	if (value === 0) {
+	if (this.faceUp === false) {
 		spriteKey = "cardBack_blue5";
 	} else {
 		const suit = this.suit;
@@ -39,5 +42,5 @@ Card.prototype.render = function (context) {
 	}
 
 	const image = assets.get(spriteKey);
-	context.drawImage(image, this.x, this.y, image.width * 0.5, image.height * 0.5);
+	context.drawImage(image, this.x, this.y, image.width * 0.3, image.height * 0.3);
 }
