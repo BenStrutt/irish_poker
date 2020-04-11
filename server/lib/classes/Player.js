@@ -47,3 +47,5 @@ Player.prototype.evalInsideOutside = function () {
 Player.prototype.reset = function () {
 	this.cards = [];
 };
+
+module.exports = Player;

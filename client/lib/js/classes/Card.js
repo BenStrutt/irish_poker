@@ -1,13 +1,20 @@
 "use strict"
 
-function Card(suit, value) {
-	this.suit = suit;
-	this.value = value;
-	this.color = this.setColor(suit);
-	this.rank = this.setRank(value);
+function Card() {
+	this.x = 0;
+	this.y = 0;
+
+	this.suit = "";
+	this.value = 0;
 }
 
-Card.prototype.setRank = function (value) {
+Card.prototype.deserialize = function (data) {
+	this.suit = data.suit;
+	this.value = data.value;
+};
+
+Card.prototype.getRank = function () {
+	const value = this.value;
 	if (value < 11) { return value; }
 
 	const faceCards = ["jack", "queen", "king", "ace"];
@@ -15,6 +22,22 @@ Card.prototype.setRank = function (value) {
 	return faceCards[index];
 };
 
-Card.prototype.setColor = function (suit) {
-	return (suit === "diamond" || suit === "heart") ? "red" : "black";
+Card.prototype.getColor = function () {
+	const suit = this.suit;
+	return (suit === "diamonds" || suit === "hearts") ? "red" : "black";
 };
+
+Card.prototype.render = function (context) {
+	const value = this.value;
+	let spriteKey;
+	if (value === 0) {
+		spriteKey = "cardBack_blue5";
+	} else {
+		const suit = this.suit;
+		const rank = value < 11 ? this.getRank() : this.getRank().charAt(0).toUpperCase();
+		spriteKey = `card${suit.charAt(0).toUpperCase() + suit.slice(1, suit.length)}${rank}`;
+	}
+
+	const image = assets.get(spriteKey);
+	context.drawImage(image, this.x, this.y, image.width * 0.5, image.height * 0.5);
+}
