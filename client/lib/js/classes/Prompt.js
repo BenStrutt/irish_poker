@@ -27,8 +27,7 @@ Prompt.prototype.update = function (deltaTime) {
 }
 
 Prompt.prototype.render = function (renderer) {
-	renderer.clearRect((this.x - this.width * 0.5) - 5, this.y - this.height * 0.5, this.width + 10, this.height);
-
+	renderer.font = "30px Helvetica";
 	const currentWidth = renderer.measureText(this.current + this.cursor).width;
 	if (currentWidth > 200) {
 		this.width = currentWidth;
@@ -43,7 +42,6 @@ Prompt.prototype.render = function (renderer) {
 	renderer.fillStyle = this.bgColor;
 	renderer.fillRect(x, y, width, height);
 
-	context.font = "30px Helvetica";
 	renderer.fillStyle = this.fgColor;
 	renderer.fillText(
 		this.current + (this.showCursor ? this.cursor : ""),

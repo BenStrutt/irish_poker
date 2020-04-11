@@ -4,12 +4,14 @@ function Player() {
 	this.cards = [];
 	this.totalDrinks = 0;
 	this.name = null;
+	this.active = true;
 }
 
 Player.prototype.deserialize = function(data) {
 	this.cards = data.cards;
 	this.totalDrinks = data.totalDrinks;
 	this.name = data.name;
+	this.active = data.active;
 }
 
 Player.prototype.takes = function (penalty) {

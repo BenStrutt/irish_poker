@@ -1,42 +1,53 @@
 "use strict";
 
-const assets = new Assets();
-assets.load(ASSET_DATA, render);
+// const assets = new Assets();
+// assets.load(ASSET_DATA, render);
 
-function render() {
-	const cardClubs2 = new Card();
-	cardClubs2.deserialize({suit: "hearts", value: 13});
-	const cardUnknown = new Card();
-
-	cardUnknown.x = 300;
-
-	cardClubs2.render(context);
-	cardUnknown.render(context);
-}
+// function render() {
+// 	const cardClubs2 = new Card();
+// 	cardClubs2.deserialize({suit: "hearts", value: 13});
+// 	const cardUnknown = new Card();
+//
+// 	cardUnknown.x = 300;
+//
+// 	cardClubs2.render(context);
+// 	cardUnknown.render(context);
+// }
 
 const connection = new Connection("localhost", 8080);
 
 connection.connect = connect;
+connection.disconnect = disconnect;
 connection.reconnect = connect;
 connection.receiveMessage = receiveMessage;
 
 function connect(id, data) {
 	const players = game.players;
 	if (id === connection.id) {
-		for (const key in data.players) {
+		for (const id in data.players) {
 			const player = new Player();
-			player.deserialize(data.players[key]);
-			players[key] = player;
+			player.deserialize(data.players[id]);
+			players[id] = player;
 		}
 		return;
 	}
 
-	if(players[id] !== undefined) { return; }
+	if (players[id] !== undefined) {
+		players[id].active = true;
+		return;
+	}
 
 	const player = new Player();
 	player.deserialize(data.players[id]);
 	players[id] = player;
+}
 
+function disconnect(id, data) {
+	for (const id in data.players) {
+		const player = new Player();
+		player.deserialize(data.players[id]);
+		game.players[id] = player;
+	}
 }
 
 function receiveMessage(id, data) {
@@ -44,6 +55,11 @@ function receiveMessage(id, data) {
 		case "set_name": {
 			game.players[id].name = data.name;
 			console.log("Welcome " + game.players[id].name + "!");
+			break;
+		}
+		case "round1": {
+			game.state = "round1"
+			context.clearRect(0, 0, Board.Width, Board.Height)
 			break;
 		}
 	}
@@ -80,15 +96,23 @@ document.addEventListener("keydown", (e) => {
 	}
 });
 
+document.addEventListener("click", handleClick);
+
+function handleClick(e) {
+	const x = e.offsetX;
+	const y = e.offsetY;
+
+	if (connection.id === 0 && game.state === "lobby") {
+		if ((x > 805 && x < 842) && (y > 4 && y < 22)) {
+			connection.sendMessage({type: "round1"});
+		}
+	}
+}
+
 const game = {
-	state: "loby",
+	state: "lobby",
 	players: {},
 };
-
-function processInput() {
-	player.name = name.current;
-	player.state = "lobby";
-}
 
 const process = {
 	time: 0,
@@ -98,19 +122,46 @@ const process = {
 		const deltaTime = time - this.time;
 		this.time = time;
 
-		if (player.state === "title") {
+		if (game.state === "lobby") {
 			name.update(deltaTime);
+			context.clearRect(0, 0, Board.Width, Board.Height)
 			name.render(context);
+			this.renderPlayerList();
 		};
 
+		// if (game.state === "round1") {
+		// 	this.renderTable();
+		// }
 	},
+
+	renderPlayerList: function () {
+		let x = 8;
+		let y = 20;
+
+		context.font = "15px Helvetica";
+		context.fillStyle = "#FFF";
+
+		if (connection.id === 0) {
+			context.fillText("Start", x + 800, y);
+		}
+
+		context.fillText("Players in lobby:", x, y);
+		y += 20;
+		for (const id in game.players) {
+			const player = game.players[id];
+			if (player.active === false || player.name === null) { continue; }
+			context.fillText(player.name, x, y);
+			y += 20;
+		}
+	},
+
+	// renderTable: function () {
+	//
+	// },
 };
 
 const name = new Prompt("Name");
 name.x = Board.Width * 0.5;
 name.y = Board.Height * 0.5;
-
-const player = new Player();
-player.state = "title";
 
 process.loop();
