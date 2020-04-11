@@ -6,6 +6,12 @@ function Player() {
 	this.name = null;
 }
 
+Player.prototype.deserialize = function(data) {
+	this.cards = data.cards;
+	this.totalDrinks = data.totalDrinks;
+	this.name = data.name;
+}
+
 Player.prototype.takes = function (penalty) {
 	this.totalDrinks += penalty;
 };

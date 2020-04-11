@@ -30,3 +30,5 @@ Deck.prototype.drawCard = function () {
 	deck.splice(index, 1);
 	return card;
 }
+
+module.exports = Deck;

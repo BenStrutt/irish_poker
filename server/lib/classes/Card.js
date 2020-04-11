@@ -18,3 +18,5 @@ Card.prototype.setRank = function (value) {
 Card.prototype.setColor = function (suit) {
 	return (suit === "diamond" || suit === "heart") ? "red" : "black";
 };
+
+module.exports = Card;

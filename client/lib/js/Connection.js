@@ -48,7 +48,7 @@ const Connection = (function () {
 				return;
 			}
 			case Message.DATA: {
-				this.log(`${id}: ${data}`);
+				this.log(`${id}: "DATA"`);
 				this.receiveMessage(id, data);
 				return;
 			}
