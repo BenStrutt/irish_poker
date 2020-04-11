@@ -2,12 +2,25 @@
 
 const connection = new Connection("localhost", 8080);
 
+connection.connect = connect;
+connection.disconnect = disconnect;
+connection.reconnect = reconnect;
 connection.receiveMessage = receiveMessage;
 
+function connect() {
+
+}
+
+function disconnect() {
+
+}
+
+function reconnect() {
+
+}
+
 function receiveMessage(id, data) {
-	if (data.type === "draw_card") {
-		drawCard(id, data.card);
-	}
+	console.log(data);
 }
 
 const Board = {
@@ -113,7 +126,6 @@ const game = {
 
 function processInput() {
 	player.name = name.current;
-	player.state = "lobby";
 }
 
 const process = {
@@ -157,7 +169,4 @@ const name = new Prompt("Name");
 name.x = Board.Width * 0.5;
 name.y = Board.Height * 0.5;
 
-const player = new Player();
-player.state = "title";
-
-process.loop();
+// process.loop();

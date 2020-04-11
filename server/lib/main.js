@@ -8,6 +8,7 @@ const Player = require("./classes/Player");
 const connection = new Connection("localhost", 8080);
 
 connection.connect = connect;
+connection.disconnect = disconnect;
 connection.receiveMessage = receiveMessage;
 
 /**
@@ -15,16 +16,33 @@ connection.receiveMessage = receiveMessage;
 	* @param data - any: e.g. {}
 	*/
 function connect(id, data) {
-	data.names = game.names;
-	data.round = game.round;
-	data.turn = game.turn;
-	data.hands = game.hands;
+	game.players.push(new Player(id));
+	data.players = game.players;
+}
+
+function disconnect(id, data) {
+	for (let i = 0; i < game.players.length; i++) {
+		const player = game.players[i];
+
+		if (player.id === id) { player.active = false; }
+	}
+	data.players = game.players;
+}
+
+function reconnect(id, data) {
+	for (let i = 0; i < game.players.length; i++) {
+		const player = game.players[i];
+
+		if (player.id === id) { player.active = false; }
+	}
+	data.players = game.players;
 }
 
 function receiveMessage(id, data) {
 	switch (data.type) {
 		case "draw_card": {
 			data.card = drawCardFromDeck(id);
+			break;
 		}
 	}
 
@@ -33,10 +51,6 @@ function receiveMessage(id, data) {
 const game = {
 	round: 0,
 	turn: 0,
-	names: {
-		["0"]: "Ben",
-		["1"]: "Chris",
-	},
-	hands: [[0,1], [0,3]],
-	deck: [0, 1]
+	players: [],
+	deck: new Deck(),
 };

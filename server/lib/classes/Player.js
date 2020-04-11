@@ -1,6 +1,8 @@
 "use strict";
 
-function Player() {
+function Player(id) {
+	this.id = id;
+	this.active = true;
 	this.cards = [];
 	this.totalDrinks = 0;
 	this.name = null;
