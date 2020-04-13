@@ -42,8 +42,8 @@ function receiveMessage(id, data) {
 		}
 		case "round1": {
 			game.state = "round1";
-			game.turn = "0";
-			
+			game.turn = 0;
+
 			for (const id in game.players) {
 				const player = game.players[id];
 				player.cards.push(game.deck.drawCard());

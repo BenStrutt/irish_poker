@@ -73,7 +73,7 @@ function receiveMessage(id, data) {
 		}
 		case "round1": {
 			game.state = "round1";
-			game.turn = "0";
+			game.turn = 0;
 			for (const id in data.players) {
 				const player = new Player();
 				player.deserialize(data.players[id]);
@@ -107,21 +107,10 @@ canvas.style.backgroundColor = "#277a2b";
 
 document.body.appendChild(canvas);
 
+let input;
+
 document.addEventListener("keydown", (e) => {
-	const code = e.keyCode;
-	if (code === 8) {
-		if (name.current.length) {
-			name.current = name.current.slice(0, -1);
-		}
-	} else if (code === 32 || code >= 65 && code <= 90) {
-		if (name.current.length < 40) { name.current += e.key; };
-	} else if (code === 13) {
-		connection.sendMessage({
-			type: "set_name",
-			name: name.current,
-		});
-		name.current = "";
-	}
+	input = e;
 });
 
 document.addEventListener("click", handleClick);
@@ -166,14 +155,18 @@ const process = {
 		this.time = time;
 
 		if (game.state === "lobby") {
-			name.update(deltaTime);
-			context.clearRect(0, 0, Board.Width, Board.Height)
+			name.update(deltaTime, input);
+			context.clearRect(0, 0, Board.Width, Board.Height);
 			name.render(context);
 			this.renderPlayerList();
 		};
 
 		if (game.state === "round1") {
-			
+			if (game.turn === connection.id) {
+				guess.update(deltaTime, input);
+				context.clearRect(0, 0, Board.Width, Board.Height);
+				guess.render(context);
+			}
 		}
 	},
 
@@ -201,8 +194,12 @@ const process = {
 	},
 };
 
-const name = new Prompt("Name");
+const name = new Prompt("Your Name");
 name.x = Board.Width * 0.5;
 name.y = Board.Height * 0.5;
+
+const guess = new Prompt("Guess");
+guess.x = Board.Width * 0.5;
+guess.y = Board.Width * 0.5;
 
 process.loop();
