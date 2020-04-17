@@ -107,10 +107,16 @@ canvas.style.backgroundColor = "#277a2b";
 
 document.body.appendChild(canvas);
 
-let input;
+// {type: keydown, keyCode, key}
+// {type: mousedown, x, y}
+const INPUT = [];
 
 document.addEventListener("keydown", (e) => {
-	input = e;
+	INPUT.push({type: "keydown", keyCode: e.keyCode, key: e.key});
+});
+
+document.addEventListener("mousedown", (e) => {
+	INPUT.push({type: "mousedown", x: e.offsetX, y: e.offsetY});
 });
 
 document.addEventListener("click", handleClick);
@@ -154,8 +160,11 @@ const process = {
 		const deltaTime = time - this.time;
 		this.time = time;
 
+		this.states[game.state]()
+
 		if (game.state === "lobby") {
-			name.update(deltaTime, input);
+			name.input(input);
+			name.update(deltaTime);
 			context.clearRect(0, 0, Board.Width, Board.Height);
 			name.render(context);
 			this.renderPlayerList();
@@ -163,11 +172,14 @@ const process = {
 
 		if (game.state === "round1") {
 			if (game.turn === connection.id) {
-				guess.update(deltaTime, input);
+				guess.input(input);
+				guess.update(deltaTime);
 				context.clearRect(0, 0, Board.Width, Board.Height);
 				guess.render(context);
 			}
 		}
+
+		input.length = 0;
 	},
 
 	renderPlayerList: function () {
@@ -200,6 +212,6 @@ name.y = Board.Height * 0.5;
 
 const guess = new Prompt("Guess");
 guess.x = Board.Width * 0.5;
-guess.y = Board.Width * 0.5;
+guess.y = Board.Height * 0.5;
 
 process.loop();

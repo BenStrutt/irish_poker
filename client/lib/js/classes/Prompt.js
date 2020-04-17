@@ -2,7 +2,6 @@
 
 function Prompt(label) {
 	this.label = label;
-	this.input = "";
 
 	this.x = 0;
 	this.y = 0;
@@ -20,34 +19,36 @@ function Prompt(label) {
 	this.showCursor = true;
 }
 
-Prompt.prototype.update = function (deltaTime, input) {
-	if ((this.time += deltaTime) >= this.timeLimit) {
-		this.showCursor = !this.showCursor;
-		this.time = 0;
-	}
+Promt.prototype.input = function (inputEvents) {
+	const current = this.current;
 
-	if (this.input === input) { return; }
+	for (let i = 0; i < inputEvents.length; i++) {
+		const input = inputEvents[i];
 
-	if (input) {
 		const keyCode = input.keyCode;
 
-		this.input = input;
-
 		if (keyCode === 8) {
-			if (name.current.length) {
-				this.current = this.current.slice(0, -1);
+			if (current.length) {
+				current = current.slice(0, -1);
 			}
 		} else if (keyCode === 32 || keyCode >= 65 && keyCode <= 90) {
-			if (this.current.length < 40) { this.current += input.key; };
+			if (current.length < 40) { current += input.key; };
 		} else if (keyCode === 13) {
 			connection.sendMessage({
 				type: "set_name",
-				name: this.current,
+				name: current,
 			});
 			this.current = "";
 		}
 	}
 
+}
+
+Prompt.prototype.update = function (deltaTime) {
+	if ((this.time += deltaTime) >= this.timeLimit) {
+		this.showCursor = !this.showCursor;
+		this.time = 0;
+	}
 }
 
 Prompt.prototype.render = function (renderer) {
