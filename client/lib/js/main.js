@@ -1,7 +1,7 @@
 "use strict";
 
 const assets = new Assets();
-// assets.load(ASSET_DATA, render);
+assets.load(ASSET_DATA, startGame);
 
 function renderCards() {
 	const players = game.players;
@@ -107,10 +107,17 @@ canvas.style.backgroundColor = "#277a2b";
 
 document.body.appendChild(canvas);
 
-let input;
+// {type: keydown, keyCode, key}
+// {type: mousedown, x, y}
+const INPUT = [];
 
 document.addEventListener("keydown", (e) => {
-	input = e;
+	INPUT.push({type: "keydown", keyCode: e.keyCode, key: e.key});
+});
+
+document.addEventListener("mousedown", (e) => {
+	INPUT.push({type: "mousedown", x: e.offsetX, y: e.offsetY});
+	game.state = "test_tween";
 });
 
 document.addEventListener("click", handleClick);
@@ -155,7 +162,8 @@ const process = {
 		this.time = time;
 
 		if (game.state === "lobby") {
-			name.update(deltaTime, input);
+			name.input(INPUT);
+			name.update(deltaTime);
 			context.clearRect(0, 0, Board.Width, Board.Height);
 			name.render(context);
 			this.renderPlayerList();
@@ -163,11 +171,73 @@ const process = {
 
 		if (game.state === "round1") {
 			if (game.turn === connection.id) {
-				guess.update(deltaTime, input);
+				guess.input(INPUT);
+				guess.update(deltaTime);
 				context.clearRect(0, 0, Board.Width, Board.Height);
 				guess.render(context);
 			}
 		}
+
+		if (game.state === "test_tween") {
+			let animate = false;
+			for (let i = 0; i < INPUT.length; i++) {
+				if (INPUT[i].type !== "mousedown") { continue; }
+				animate = true;
+				break;
+			}
+			if (animate) {
+				const cards = [];
+				const suits = ["clubs", "diamonds", "hearts", "spades"];
+
+				for (let i = 0; i < suits.length; i++) {
+					const suit = suits[i];
+					for (let j = 2; j <= 14; j++) {
+						const card = new Card(Board.Width * 0.5, Board.Height * 0.5);
+						card.deserialize({suit: suit, value: j, faceUp: false});
+						card.angle = (-5 + Math.random() * 10) * Math.PI / 180;
+						cards.push(card);
+					}
+				}
+
+				for (let i = 0; i < cards.length; i++) {
+					const index = i + Math.floor(Math.random() * (cards.length - i));
+					const card = cards[i];
+					cards[i] = cards[index];
+					cards[index] = card;
+				}
+
+				const orientations = [
+					{angle: 540 * Math.PI / 180, x: Board.Width - 100, y: Board.Height * 0.5},
+					{angle: 360 * Math.PI / 180, x: Board.Width * 0.5, y: Board.Height - 100},
+					{angle: -540 * Math.PI / 180, x: 100, y: Board.Height * 0.5},
+					{angle: -360 * Math.PI / 180, x: Board.Width * 0.5, y: 100},
+				];
+				for (let i = 0; i < orientations.length; i++) {
+					const card = cards[cards.length - i - 1];
+					tween.create(card)
+						.wait(3000 + 150 * i)
+						.to(orientations[i], 500)
+						.to({scaleX: 0}, 64)
+						.call(() => card.faceUp = true)
+						.to({scaleX: 0.4}, 64);
+				}
+
+				game.tween_data = { cards: cards };
+			}
+
+			if (game.tween_data !== undefined) {
+				const cards = game.tween_data.cards;
+				tween.update(deltaTime);
+
+				context.clearRect(0, 0, Board.Width, Board.Height);
+
+				for (let i = 0; i < cards.length; i++) {
+					cards[i].render(context);
+				}
+			}
+		}
+
+		INPUT.length = 0;
 	},
 
 	renderPlayerList: function () {
@@ -200,6 +270,8 @@ name.y = Board.Height * 0.5;
 
 const guess = new Prompt("Guess");
 guess.x = Board.Width * 0.5;
-guess.y = Board.Width * 0.5;
+guess.y = Board.Height * 0.5;
 
-process.loop();
+function startGame() {
+	process.loop();
+}

@@ -1,19 +1,21 @@
 "use strict"
 
-function Card() {
-	this.x = 0;
-	this.y = 0;
+function Card(x, y) {
+	this.x = x;
+	this.y = y;
+	this.angle = 0;
+	this.scaleX = 0.4;
+	this.scaleY = 0.4;
 
 	this.suit = "";
 	this.value = 0;
+	this.faceUp = false;
 }
 
 Card.prototype.deserialize = function (data) {
 	this.suit = data.suit;
 	this.value = data.value;
 	this.faceUp = data.faceUp;
-	this.x = data.x;
-	this.y = data.y;
 };
 
 Card.prototype.getRank = function () {
@@ -41,6 +43,14 @@ Card.prototype.render = function (context) {
 		spriteKey = `card${suit.charAt(0).toUpperCase() + suit.slice(1, suit.length)}${rank}`;
 	}
 
+	context.translate(this.x, this.y);
+	context.scale(this.scaleX, this.scaleY);
+	context.rotate(this.angle);
+
 	const image = assets.get(spriteKey);
-	context.drawImage(image, this.x, this.y, image.width * 0.3, image.height * 0.3);
+	const width = image.width;
+	const height = image.height;
+	context.drawImage(image, -width * 0.5, -height * 0.5, width, height);
+
+	context.resetTransform();
 }
