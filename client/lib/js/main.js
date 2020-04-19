@@ -1,36 +1,53 @@
 "use strict";
 
-const assets = new Assets();
-// assets.load(ASSET_DATA, render);
-
-function renderCards() {
-	const players = game.players;
-
-	for (const id in players) {
-		if (players[id].active === false || players[id].cards.length === 0) { continue; }
-
-		for (let i = 0; i < players[id].cards.length; i++) {
-			players[id].cards[i].render(context);
-		}
-	}
-
-	//
-	// const cardClubs2 = new Card();
-	// cardClubs2.deserialize({suit: "hearts", value: 13});
-	// const cardUnknown = new Card();
-	//
-	// cardUnknown.x = 300;
-	//
-	// cardClubs2.render(context);
-	// cardUnknown.render(context);
-}
-
 const connection = new Connection("localhost", 8080);
 
 connection.connect = connect;
 connection.disconnect = disconnect;
 connection.reconnect = connect;
 connection.receiveMessage = receiveMessage;
+
+const canvas = document.createElement("canvas");
+const context = canvas.getContext("2d");
+
+const Board = {
+	Width: 1200,
+	Height: 600,
+}
+
+canvas.width = Board.Width;
+canvas.height = Board.Height;
+canvas.style.backgroundColor = "#277a2b";
+
+document.body.appendChild(canvas);
+
+const game = {
+	state: null,
+	players: {},
+};
+
+const assets = new Assets();
+assets.load(ASSET_DATA, gameStart);
+
+const name = new Prompt("Your Name");
+name.x = Board.Width * 0.5;
+name.y = Board.Height * 0.5;
+
+// {type: keydown, keyCode, key}
+// {type: mousedown, x, y}
+const INPUT = [];
+
+document.addEventListener("keydown", (e) => {
+	INPUT.push({type: "keydown", keyCode: e.keyCode, key: e.key});
+});
+
+document.addEventListener("mousedown", (e) => {
+	INPUT.push({type: "mousedown", x: e.offsetX, y: e.offsetY});
+});
+
+function gameStart() {
+	process.loop();
+}
 
 function connect(id, data) {
 	const players = game.players;
@@ -93,81 +110,26 @@ function receiveMessage(id, data) {
 	}
 }
 
-const Board = {
-	Width: 1200,
-	Height: 600,
-}
-
-const canvas = document.createElement("canvas");
-const context = canvas.getContext("2d");
-
-canvas.width = Board.Width;
-canvas.height = Board.Height;
-canvas.style.backgroundColor = "#277a2b";
-
-document.body.appendChild(canvas);
-
-let input;
-
-document.addEventListener("keydown", (e) => {
-	input = e;
-});
-
-document.addEventListener("click", handleClick);
-
-function handleClick(e) {
-	const x = e.offsetX;
-	const y = e.offsetY;
-
-	if (connection.id === 0 && game.state === "lobby") {
-		if ((x > 805 && x < 842) && (y > 4 && y < 22)) {
-			connection.sendMessage({type: "round1"});
-		}
-	}
-}
-
-const game = {
-	state: null,
-	players: {},
-};
-
-function renderTable() {
-	context.font = "15px Helvetica";
-
-	for (const id in game.players) {
-		const player = game.players[id];
-
-		if (player.active === false) { continue; }
-
-		context.fillStyle = (id === game.turn) ? "#FF0" : "#FFF";
-		context.fillText(player.name, player.positionX, player.positionY);
-
-		assets.load(ASSET_DATA, renderCards);
-	}
-}
-
 const process = {
 	time: 0,
+
 	loop: function (time = 0) {
 		requestAnimationFrame(this.loop.bind(this));
 
 		const deltaTime = time - this.time;
 		this.time = time;
 
+		// this.states[game.state]()
+
 		if (game.state === "lobby") {
-			name.update(deltaTime, input);
+			name.input(INPUT);
+			name.update(deltaTime);
 			context.clearRect(0, 0, Board.Width, Board.Height);
 			name.render(context);
 			this.renderPlayerList();
 		};
 
-		if (game.state === "round1") {
-			if (game.turn === connection.id) {
-				guess.update(deltaTime, input);
-				context.clearRect(0, 0, Board.Width, Board.Height);
-				guess.render(context);
-			}
-		}
+		INPUT.length = 0;
 	},
 
 	renderPlayerList: function () {
@@ -193,13 +155,3 @@ const process = {
 		}
 	},
 };
-
-const name = new Prompt("Your Name");
-name.x = Board.Width * 0.5;
-name.y = Board.Height * 0.5;
-
-const guess = new Prompt("Guess");
-guess.x = Board.Width * 0.5;
-guess.y = Board.Width * 0.5;
-
-process.loop();
