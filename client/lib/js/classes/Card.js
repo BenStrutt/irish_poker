@@ -1,19 +1,16 @@
 "use strict"
 
 function Card() {
-	this.x = 0;
-	this.y = 0;
-
 	this.suit = "";
 	this.value = 0;
+	this.faceUp = false;
 }
 
-Card.prototype.deserialize = function (data) {
-	this.suit = data.suit;
-	this.value = data.value;
-	this.faceUp = data.faceUp;
-	this.x = data.x;
-	this.y = data.y;
+Card.prototype.deserialize = function (card) {
+	if (card.faceUp === false) { return; }
+	this.suit = card.suit;
+	this.value = card.value;
+	this.faceUp = card.faceUp;
 };
 
 Card.prototype.getRank = function () {

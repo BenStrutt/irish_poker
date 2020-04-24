@@ -16,7 +16,7 @@ Deck.prototype.populateCards = function () {
 
 	for (let i = 0; i < suits.length; i++) {
 		for (let j = 2; j <= 14; j++) {
-			const card = new Card(i, j);
+			const card = new Card(suits[i], j);
 			cards.push(card);
 		}
 	}

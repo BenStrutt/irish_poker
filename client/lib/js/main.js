@@ -22,14 +22,14 @@ canvas.style.backgroundColor = "#277a2b";
 document.body.appendChild(canvas);
 
 const game = {
-	state: null,
+	round: 0,
 	players: {},
 };
 
 const assets = new Assets();
-assets.load(ASSET_DATA, gameStart);
+assets.load(ASSET_DATA, startGame);
 
-const name = new Prompt("Your Name");
+const name = new Prompt("name");
 name.x = Board.Width * 0.5;
 name.y = Board.Height * 0.5;
 
@@ -45,20 +45,22 @@ document.addEventListener("mousedown", (e) => {
 	INPUT.push({type: "mousedown", x: e.offsetX, y: e.offsetY});
 });
 
-function gameStart() {
+function startGame() {
 	process.loop();
 }
 
 function connect(id, data) {
 	const players = game.players;
+
 	if (id === connection.id) {
 		for (const id in data.players) {
 			const player = new Player();
 			player.deserialize(data.players[id]);
-			players[id] = player;
+			game.players[id] = player;
 		}
 
-		game.state = data.state;
+		game.round = data.round;
+		game.turn = data.turn;
 
 		return;
 	}
@@ -74,44 +76,76 @@ function connect(id, data) {
 }
 
 function disconnect(id, data) {
-	for (const id in data.players) {
-		const player = new Player();
-		player.deserialize(data.players[id]);
-		game.players[id] = player;
-	}
+	deserializePlayerData(data.players);
 }
 
 function receiveMessage(id, data) {
 	switch (data.type) {
-		case "set_name": {
-			game.players[id].name = data.name;
+		case "name": {
+			game.players[id].name = data.input;
 			console.log("Welcome " + game.players[id].name + "!");
 			break;
 		}
-		case "round1": {
-			game.state = "round1";
+		case "start": {
+			game.round = 1;
 			game.turn = 0;
-			for (const id in data.players) {
-				const player = new Player();
-				player.deserialize(data.players[id]);
-
-				for (let i = 0; i < player.cards.length; i++) {
-					const card = new Card();
-					card.deserialize(player.cards[i]);
-					player.cards[i] = card;
-				}
-
-				game.players[id] = player;
-			}
+			deserializePlayerData(data.players);
 			context.clearRect(0, 0, Board.Width, Board.Height)
-			renderTable();
 			break;
 		}
+		case "correct": {
+			console.log("correct!");
+
+			if (id === connection.id) { game.players[id].gives(game.round * 2); }
+
+			game.turn = data.turn;
+			game.round = data.round;
+			deserializePlayerData(data.players);
+			break;
+		}
+		case "incorrect": {
+			console.log("incorrect :(");
+
+			if (id === connection.id) { game.players[id].takes(game.round * 2); }
+
+			game.turn = data.turn;
+			game.round = data.round;
+			break;
+		}
+		case "takes": {
+			console.log(`${game.players[id].name} takes ${data.penalty} drinks.`)
+			game.turn = data.turn;
+			game.round = data.round;
+			deserializePlayerData(data.players);
+			break;
+		}
+		case "gives": {
+			console.log(`${game.players[id].name} gives ${data.taker} ${data.penalty} drinks.`)
+			game.turn = data.turn;
+			game.round = data.round;
+			deserializePlayerData(data.players);
+			break;
+		}
+	}
+}
+
+function deserializePlayerData(players) {
+	for (const id in players) {
+		const player = new Player();
+		player.deserialize(players[id]);
+		game.players[id] = player;
 	}
 }
 
 const process = {
 	time: 0,
+	round: {
+		0: lobby,
+		1: roundOne,
+		2: roundTwo,
+		3: roundThree,
+		4: roundFour,
+	},
 
 	loop: function (time = 0) {
 		requestAnimationFrame(this.loop.bind(this));
@@ -119,39 +153,119 @@ const process = {
 		const deltaTime = time - this.time;
 		this.time = time;
 
-		// this.states[game.state]()
-
-		if (game.state === "lobby") {
-			name.input(INPUT);
-			name.update(deltaTime);
-			context.clearRect(0, 0, Board.Width, Board.Height);
-			name.render(context);
-			this.renderPlayerList();
-		};
+		this.round[game.round](INPUT, deltaTime)
 
 		INPUT.length = 0;
 	},
-
-	renderPlayerList: function () {
-		let x = 8;
-		let y = 20;
-
-		context.font = "15px Helvetica";
-		context.fillStyle = "#FFF";
-
-		if (connection.id === 0) {
-			context.fillText("Start", x + 800, y);
-		}
-
-		context.fillText("Players in lobby:", x, y);
-		y += 20;
-		for (const id in game.players) {
-			const player = game.players[id];
-
-			if (player.active === false || player.name === null) { continue; }
-
-			context.fillText(player.name, x, y);
-			y += 20;
-		}
-	},
 };
+
+function lobby(ipt, time) {
+	name.input(ipt);
+	name.update(time);
+	context.clearRect(0, 0, Board.Width, Board.Height);
+	name.render(context);
+	renderPlayerList();
+}
+
+function renderPlayerList() {
+	let x = 8;
+	let y = 20;
+
+	context.font = "15px Helvetica";
+	context.fillStyle = "#FFF";
+
+	context.fillText("Players in lobby:", x, y);
+	y += 20;
+	for (const id in game.players) {
+		const player = game.players[id];
+
+		if (player.active === false || player.name === null) { continue; }
+
+		context.fillText(player.name, x, y);
+		y += 20;
+	}
+}
+
+function roundOne(ipt, time) {
+	context.clearRect(0, 0, Board.Width, Board.Height);
+
+	context.font = "15px Helvetica";
+	context.fillStyle = "FFF";
+
+	if (game.turn === connection.id) {
+		context.fillText(
+			"Your turn. Guess either Red or Black.",
+			Board.Width * 0.5,
+			Board.Height * 0.5,
+		);
+	} else {
+		context.fillText(
+			`${game.players[game.turn].name} is guessing.`,
+			Board.Width * 0.5,
+			Board.Height * 0.5,
+		);
+	}
+}
+
+function roundTwo(ipt, time) {
+	context.clearRect(0, 0, Board.Width, Board.Height);
+
+	context.font = "15px Helvetica";
+	context.fillStyle = "FFF";
+
+	if (game.turn === connection.id) {
+		context.fillText(
+			"Your turn. Guess Inside, Outside, or Same.",
+			Board.Width * 0.5,
+			Board.Height * 0.5,
+		);
+	} else {
+		context.fillText(
+			`${game.players[game.turn].name} is guessing.`,
+			Board.Width * 0.5,
+			Board.Height * 0.5,
+		);
+	}
+}
+
+function roundThree(ipt, time) {
+	context.clearRect(0, 0, Board.Width, Board.Height);
+
+	context.font = "15px Helvetica";
+	context.fillStyle = "FFF";
+
+	if (game.turn === connection.id) {
+		context.fillText(
+			"Your turn. Guess Higher, Lower, or Same.",
+			Board.Width * 0.5,
+			Board.Height * 0.5,
+		);
+	} else {
+		context.fillText(
+			`${game.players[game.turn].name} is guessing.`,
+			Board.Width * 0.5,
+			Board.Height * 0.5,
+		);
+	}
+}
+
+function roundFour(ipt, time) {
+	context.clearRect(0, 0, Board.Width, Board.Height);
+
+	context.font = "15px Helvetica";
+	context.fillStyle = "FFF";
+
+	if (game.turn === connection.id) {
+		context.fillText(
+			"Your turn. Guess the suit.",
+			Board.Width * 0.5,
+			Board.Height * 0.5,
+		);
+	} else {
+		context.fillText(
+			`${game.players[game.turn].name} is guessing.`,
+			Board.Width * 0.5,
+			Board.Height * 0.5,
+		);
+	}
+}

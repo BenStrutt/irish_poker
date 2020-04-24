@@ -7,21 +7,33 @@ function Player() {
 	this.active = true;
 }
 
-Player.prototype.deserialize = function(data) {
-	this.cards = data.cards;
-	this.totalDrinks = data.totalDrinks;
-	this.name = data.name;
-	this.active = data.active;
-	this.positionX = data.positionX;
-	this.positionY = data.positionY;
+Player.prototype.deserialize = function(player) {
+	this.cards = this.deserializeCards(player);
+	this.totalDrinks = player.totalDrinks;
+	this.name = player.name;
+	this.active = player.active;
+	this.positionX = player.positionX;
+	this.positionY = player.positionY;
+}
+
+Player.prototype.deserializeCards = function(player) {
+	const cards = []
+	for (let i = 0; i < player.cards.length; i++) {
+		const card = new Card();
+		card.deserialize(player.cards[i]);
+		cards[i] = card;
+	}
+
+	return cards;
 }
 
 Player.prototype.takes = function (penalty) {
-	this.totalDrinks += penalty;
+	console.log(`You take ${penalty} drinks.`)
+	connection.sendMessage({type: "takes", penalty: penalty})
 };
 
 Player.prototype.gives = function (penalty) {
-
+	console.log("Give drinks to players");
 };
 
 Player.prototype.evalHighLow = function () {

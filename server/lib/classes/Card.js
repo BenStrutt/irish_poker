@@ -3,12 +3,10 @@
 function Card(suit, value) {
 	this.suit = suit;
 	this.value = value;
-	this.color = this.setColor(suit);
-	this.rank = this.setRank(value);
 	this.faceUp = false;
 }
 
-Card.prototype.setRank = function (value) {
+Card.prototype.getRank = function (value) {
 	if (value < 11) { return value; }
 
 	const faceCards = ["jack", "queen", "king", "ace"];
@@ -16,8 +14,8 @@ Card.prototype.setRank = function (value) {
 	return faceCards[index];
 };
 
-Card.prototype.setColor = function (suit) {
-	return (suit === "diamond" || suit === "heart") ? "red" : "black";
+Card.prototype.getColor = function () {
+	return (this.suit === "diamond" || this.suit === "heart") ? "red" : "black";
 };
 
 module.exports = Card;

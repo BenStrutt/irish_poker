@@ -35,8 +35,8 @@ Prompt.prototype.input = function (inputEvents) {
 			if (current.length < 40) { this.current += input.key; };
 		} else if (keyCode === 13) {
 			connection.sendMessage({
-				type: "set_name",
-				name: current,
+				type: this.label,
+				input: current,
 			});
 			this.current = "";
 		}
