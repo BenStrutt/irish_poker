@@ -121,7 +121,7 @@ function evaluateGuess(guess) {
 }
 
 function evalRedBlack(guess) {
-	return game.players[game.turn].cards[0].getColor === guess;
+	return game.players[game.turn].cards[0].getColor() === guess;
 }
 
 function evalHighLow(guess) {

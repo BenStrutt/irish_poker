@@ -12,7 +12,7 @@ Deck.prototype.initialize = function () {
 
 Deck.prototype.populateCards = function () {
 	const cards = []
-	const suits = ["club", "diamond", "heart", "spade"];
+	const suits = ["clubs", "diamonds", "hearts", "spades"];
 
 	for (let i = 0; i < suits.length; i++) {
 		for (let j = 2; j <= 14; j++) {

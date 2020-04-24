@@ -120,7 +120,7 @@ function receiveMessage(id, data) {
 			break;
 		}
 		case "gives": {
-			console.log(`${game.players[id].name} gives ${data.taker} ${data.penalty} drinks.`)
+			console.log(`${game.players[id].name} gives ${game.players[data.taker].name} ${data.penalty} drinks.`)
 			game.turn = data.turn;
 			game.round = data.round;
 			deserializePlayerData(data.players);

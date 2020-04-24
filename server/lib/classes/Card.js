@@ -15,7 +15,7 @@ Card.prototype.getRank = function (value) {
 };
 
 Card.prototype.getColor = function () {
-	return (this.suit === "diamond" || this.suit === "heart") ? "red" : "black";
+	return (this.suit === "diamonds" || this.suit === "hearts") ? "red" : "black";
 };
 
 module.exports = Card;
