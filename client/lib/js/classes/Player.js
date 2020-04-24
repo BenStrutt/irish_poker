@@ -1,6 +1,13 @@
 "use strict";
 
-function Player() {
+function Player(x, y) {
+	this.x = x;
+	this.y = y;
+
+	this.angle = 0;
+	this.scaleX = 0.5;
+	this.scaleY = 0.5;
+
 	this.cards = [];
 	this.totalDrinks = 0;
 	this.name = null;
@@ -65,5 +72,25 @@ Player.prototype.evalInsideOutside = function () {
 };
 
 Player.prototype.reset = function () {
-	this.cards = [];
+	this.cards.length = 0;
+};
+
+Player.prototype.render = function (renderer) {
+	renderer.save();
+
+	renderer.translate(this.x, this.y);
+	renderer.scale(this.scaleX, this.scaleY);
+	renderer.rotate(this.angle);
+
+	const cards = this.cards;
+	const margin = 160; // 140 is card width
+	const originX = -(cards.length - 1) * margin * 0.5;
+	for (let i = 0; i < cards.length; i++) {
+		const card = cards[i];
+		card.x = originX + i * margin;
+		card.y = 0;
+		card.render(renderer);
+	}
+
+	renderer.restore();
 };

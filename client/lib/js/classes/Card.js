@@ -3,9 +3,13 @@
 function Card(x, y) {
 	this.x = x;
 	this.y = y;
+
+	this.width = 140;
+	this.height = 190;
+
 	this.angle = 0;
-	this.scaleX = 0.4;
-	this.scaleY = 0.4;
+	this.scaleX = 1;
+	this.scaleY = 1;
 
 	this.suit = "";
 	this.value = 0;
@@ -33,7 +37,7 @@ Card.prototype.getColor = function () {
 	return (suit === "diamonds" || suit === "hearts") ? "red" : "black";
 };
 
-Card.prototype.render = function (context) {
+Card.prototype.render = function (renderer) {
 	const value = this.value;
 	let spriteKey;
 	if (this.faceUp === false) {
@@ -44,14 +48,17 @@ Card.prototype.render = function (context) {
 		spriteKey = `card${suit.charAt(0).toUpperCase() + suit.slice(1, suit.length)}${rank}`;
 	}
 
-	context.translate(this.x, this.y);
-	context.scale(this.scaleX, this.scaleY);
-	context.rotate(this.angle);
+	renderer.save();
+
+	renderer.translate(this.x, this.y);
+	renderer.scale(this.scaleX, this.scaleY);
+	renderer.rotate(this.angle);
 
 	const image = assets.get(spriteKey);
 	const width = image.width;
 	const height = image.height;
-	context.drawImage(image, -width * 0.5, -height * 0.5, width, height);
+	renderer.drawImage(image, -width * 0.5, -height * 0.5, width, height);
 
-	context.resetTransform();
+	renderer.restore();
+
 }

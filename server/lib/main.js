@@ -13,25 +13,22 @@ connection.reconnect = connect;
 connection.receiveMessage = receiveMessage;
 
 function connect(id, data) {
-
 	if (game.round === 0) {
 		if (game.players[id] === undefined) {
 			game.players[id] = new Player();
-			game.players[id].positionX = ((id % 5) * 240) + 15;
-			game.players[id].positionY = (Math.floor(id / 5) * 300) + 20;
 		}
 	}
 
 	game.players[id].active = true;
 
 	data.round = game.round;
-	data.players = game.players;
 	data.turn = game.turn;
+
+	data.players = game.players;
 }
 
 function disconnect(id, data) {
 	game.players[id].active = false;
-	data.players = game.players;
 }
 
 function receiveMessage(id, data) {
