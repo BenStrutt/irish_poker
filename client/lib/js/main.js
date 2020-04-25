@@ -33,6 +33,116 @@ const name = new Prompt("name");
 name.x = Board.Width * 0.5;
 name.y = Board.Height * 0.5;
 
+const buttons = {
+	start: new Button(
+		Board.Width * 0.9,
+		Board.Height * 0.05,
+		80,
+		40,
+		"Start",
+		function () { connection.sendMessage({type: "start"}) },
+	),
+
+	red: new Button(
+		Board.Width * 0.4,
+		Board.Height * 0.5,
+		80,
+		40,
+		"Red",
+		function () { connection.sendMessage({type: "guess", guess: "red"})}
+	),
+
+	black: new Button(
+		Board.Width * 0.6,
+		Board.Height * 0.5,
+		80,
+		40,
+		"Black",
+		function () { connection.sendMessage({type: "guess", guess: "black"})}
+	),
+
+	higher: new Button(
+		Board.Width * 0.3,
+		Board.Height * 0.5,
+		80,
+		40,
+		"Higher",
+		function () { connection.sendMessage({type: "guess", guess: "higher"})}
+	),
+
+	lower: new Button(
+		Board.Width * 0.7,
+		Board.Height * 0.5,
+		80,
+		40,
+		"Lower",
+		function () { connection.sendMessage({type: "guess", guess: "lower"})}
+	),
+
+	same: new Button(
+		Board.Width * 0.5,
+		Board.Height * 0.5,
+		80,
+		40,
+		"Same",
+		function () { connection.sendMessage({type: "guess", guess: "same"})}
+	),
+
+	inside: new Button(
+		Board.Width * 0.3,
+		Board.Height * 0.5,
+		80,
+		40,
+		"Inside",
+		function () { connection.sendMessage({type: "guess", guess: "inside"})}
+	),
+
+	outside: new Button(
+		Board.Width * 0.7,
+		Board.Height * 0.5,
+		80,
+		40,
+		"Outside",
+		function () { connection.sendMessage({type: "guess", guess: "outside"})}
+	),
+
+	clubs: new Button(
+		Board.Width * 0.2,
+		Board.Height * 0.5,
+		80,
+		40,
+		"Clubs",
+		function () { connection.sendMessage({type: "guess", guess: "clubs"})}
+	),
+
+	diamonds: new Button(
+		Board.Width * 0.4,
+		Board.Height * 0.5,
+		80,
+		40,
+		"Diamonds",
+		function () { connection.sendMessage({type: "guess", guess: "diamonds"})}
+	),
+
+	hearts: new Button(
+		Board.Width * 0.6,
+		Board.Height * 0.5,
+		80,
+		40,
+		"Hearts",
+		function () { connection.sendMessage({type: "guess", guess: "hearts"})}
+	),
+
+	spades: new Button(
+		Board.Width * 0.8,
+		Board.Height * 0.5,
+		80,
+		40,
+		"Spades",
+		function () { connection.sendMessage({type: "guess", guess: "spades"})}
+	),
+}
+
 // {type: keydown, keyCode, key}
 // {type: mousedown, x, y}
 const INPUT = [];
@@ -150,6 +260,12 @@ function receiveMessage(id, data) {
 			deserializePlayerData(data.players);
 			break;
 		}
+		case "reset": {
+			game.turn = data.turn;
+			game.round = data.round;
+			deserializePlayerData(data.players);
+			break;
+		}
 	}
 }
 
@@ -192,17 +308,8 @@ const process = {
 	},
 };
 
-const button = new Button(
-	Board.Width * 0.5,
-	Board.Height * 0.5,
-	100,
-	50,
-	function () { console.log("PRESSED!"); },
-);
-button.text = "BUTTON";
-
 function lobby(ipt, time) {
-	button.input(ipt);
+	if (connection.id === 0) { buttons.start.input(ipt); }
 	name.input(ipt);
 	name.update(time);
 
@@ -210,7 +317,7 @@ function lobby(ipt, time) {
 
 	name.render(context);
 	renderPlayerList();
-	button.render(context);
+	if (connection.id === 0) { buttons.start.render(context); }
 }
 
 function renderPlayerList() {
@@ -235,6 +342,7 @@ function renderPlayerList() {
 function roundOne(ipt, time) {
 	context.clearRect(0, 0, Board.Width, Board.Height);
 
+	const btns = ["red", "black"];
 	const players = game.players;
 
 	for (const key in players) {
@@ -252,10 +360,12 @@ function roundOne(ipt, time) {
 
 	if (game.turn === connection.id) {
 		context.fillText(
-			"Your turn. Guess either Red or Black.",
+			"Your turn.",
 			Board.Width * 0.5,
-			Board.Height * 0.5,
+			Board.Height * 0.35,
 		);
+		for (const type of btns) { buttons[type].input(ipt); }
+		for (const type of btns) { buttons[type].render(context); }
 	} else {
 		context.fillText(
 			`${game.players[game.turn].name} is guessing.`,
@@ -268,6 +378,7 @@ function roundOne(ipt, time) {
 function roundTwo(ipt, time) {
 	context.clearRect(0, 0, Board.Width, Board.Height);
 
+	const btns = ["higher", "lower", "same"];
 	const players = game.players;
 
 	for (const key in players) {
@@ -284,10 +395,12 @@ function roundTwo(ipt, time) {
 
 	if (game.turn === connection.id) {
 		context.fillText(
-			"Your turn. Guess Inside, Outside, or Same.",
+			"Your turn.",
 			Board.Width * 0.5,
-			Board.Height * 0.5,
+			Board.Height * 0.35,
 		);
+		for (const type of btns) { buttons[type].input(ipt); }
+		for (const type of btns) { buttons[type].render(context); }
 	} else {
 		context.fillText(
 			`${game.players[game.turn].name} is guessing.`,
@@ -300,6 +413,7 @@ function roundTwo(ipt, time) {
 function roundThree(ipt, time) {
 	context.clearRect(0, 0, Board.Width, Board.Height);
 
+	const btns = ["inside", "outside", "same"];
 	const players = game.players;
 
 	for (const key in players) {
@@ -317,10 +431,12 @@ function roundThree(ipt, time) {
 
 	if (game.turn === connection.id) {
 		context.fillText(
-			"Your turn. Guess Higher, Lower, or Same.",
+			"Your turn.",
 			Board.Width * 0.5,
-			Board.Height * 0.5,
+			Board.Height * 0.35,
 		);
+		for (const type of btns) { buttons[type].input(ipt); }
+		for (const type of btns) { buttons[type].render(context); }
 	} else {
 		context.fillText(
 			`${game.players[game.turn].name} is guessing.`,
@@ -333,6 +449,7 @@ function roundThree(ipt, time) {
 function roundFour(ipt, time) {
 	context.clearRect(0, 0, Board.Width, Board.Height);
 
+	const btns = ["clubs", "diamonds", "hearts", "spades"];
 	const players = game.players;
 
 	for (const key in players) {
@@ -350,10 +467,12 @@ function roundFour(ipt, time) {
 
 	if (game.turn === connection.id) {
 		context.fillText(
-			"Your turn. Guess the suit.",
+			"Your turn.",
 			Board.Width * 0.5,
-			Board.Height * 0.5,
+			Board.Height * 0.35,
 		);
+		for (const type of btns) { buttons[type].input(ipt); }
+		for (const type of btns) { buttons[type].render(context); }
 	} else {
 		context.fillText(
 			`${game.players[game.turn].name} is guessing.`,

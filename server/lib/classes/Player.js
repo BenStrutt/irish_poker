@@ -45,7 +45,8 @@ Player.prototype.evalInsideOutside = function () {
 };
 
 Player.prototype.reset = function () {
-	this.cards = [];
+	this.cards.length = 0;
+	this.totalDrinks = 0;
 };
 
 module.exports = Player;

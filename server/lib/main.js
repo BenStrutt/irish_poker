@@ -70,6 +70,14 @@ function receiveMessage(id, data) {
 					dealCards();
 				}
 
+				if (game.round > 4) {
+					game.round = 1;
+					game.turn = 0;
+					data.type = "reset";
+					for (const id in game.players) { game.players[id].reset(); }
+					dealCards();
+				}
+
 				data.turn = game.turn;
 				data.round = game.round;
 				data.players = game.players;
@@ -110,8 +118,8 @@ function evaluateGuess(guess) {
 	const evalFunction = {
 		1: evalRedBlack,
 		2: evalHighLow,
-		// 3: evalInsideOutside,
-		// 4: evalSuit,
+		3: evalInsideOutside,
+		4: evalSuit,
 	}
 
 	return evalFunction[game.round](guess);
@@ -157,4 +165,9 @@ function evalInsideOutside(guess) {
 	}
 
 	return false;
+}
+
+function evalSuit(guess) {
+	const card = game.players[game.turn].cards[3];
+	return card.suit === guess;
 }

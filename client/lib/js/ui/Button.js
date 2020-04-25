@@ -1,17 +1,17 @@
-function Button(x, y, width, height, callback) {
+function Button(x, y, width, height, text, callback) {
 	this.x = x;
 	this.y = y;
 
 	this.width = width;
 	this.height = height;
 
-	this.angle = 1;
+	this.angle = 0;
 	this.scaleX = 1;
 	this.scaleY = 1;
 
-	this.color = "#f0f";
+	this.color = "#d9a414";
 	this.key = undefined;
-	this.text = undefined;
+	this.text = text;
 	this.font = undefined;
 
 	this.pressed = false;
