@@ -236,6 +236,12 @@ function roundOne(ipt, time) {
 	context.clearRect(0, 0, Board.Width, Board.Height);
 
 	const players = game.players;
+
+	for (const key in players) {
+		const player = players[key];
+		player.input(ipt);
+	}
+
 	for (const key in players) {
 		const player = players[key];
 		player.render(context);
@@ -263,11 +269,16 @@ function roundTwo(ipt, time) {
 	context.clearRect(0, 0, Board.Width, Board.Height);
 
 	const players = game.players;
+
+	for (const key in players) {
+		const player = players[key];
+		player.input(ipt);
+	}
+
 	for (const key in players) {
 		const player = players[key];
 		player.render(context);
 	}
-
 	context.font = "15px Helvetica";
 	context.fillStyle = "FFF";
 
@@ -290,6 +301,12 @@ function roundThree(ipt, time) {
 	context.clearRect(0, 0, Board.Width, Board.Height);
 
 	const players = game.players;
+
+	for (const key in players) {
+		const player = players[key];
+		player.input(ipt);
+	}
+
 	for (const key in players) {
 		const player = players[key];
 		player.render(context);
@@ -317,6 +334,12 @@ function roundFour(ipt, time) {
 	context.clearRect(0, 0, Board.Width, Board.Height);
 
 	const players = game.players;
+
+	for (const key in players) {
+		const player = players[key];
+		player.input(ipt);
+	}
+
 	for (const key in players) {
 		const player = players[key];
 		player.render(context);

@@ -79,8 +79,8 @@ Player.prototype.render = function (renderer) {
 	renderer.save();
 
 	renderer.translate(this.x, this.y);
-	renderer.scale(this.scaleX, this.scaleY);
 	renderer.rotate(this.angle);
+	renderer.scale(this.scaleX, this.scaleY);
 
 	const cards = this.cards;
 	const margin = 160; // 140 is card width
@@ -93,4 +93,11 @@ Player.prototype.render = function (renderer) {
 	}
 
 	renderer.restore();
+};
+
+Player.prototype.input = function (inputEvents) {
+	const cards = this.cards;
+	for (let i = 0; i < cards.length; i++) {
+		cards[i].input(inputEvents);
+	}
 };

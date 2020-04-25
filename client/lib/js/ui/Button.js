@@ -5,46 +5,60 @@ function Button(x, y, width, height, callback) {
 	this.width = width;
 	this.height = height;
 
-	this.angle = 0;
+	this.angle = 1;
 	this.scaleX = 1;
 	this.scaleY = 1;
 
 	this.color = "#f0f";
 	this.key = undefined;
 	this.text = undefined;
+	this.font = undefined;
 
 	this.pressed = false;
 	this.onPress = callback;
+
+	this.transform = new DOMMatrix(); // identity matrix
+
 }
 
 Button.prototype.input = function (inputEvents) {
-	const x = this.x;
-	const y = this.y;
 	const width = this.width;
 	const height = this.height;
 
-	const left = x - width * 0.5;
-	const right = x + width * 0.5;
-	const top = y - height * 0.5;
-	const bottom = y + height * 0.5;
+	const left = -width * 0.5;
+	const right = width * 0.5;
+	const top = -height * 0.5;
+	const bottom = height * 0.5;
+
+	const transform = this.transform.inverse();
 
 	for (let i = 0; i < inputEvents.length; i++) {
 		const input = inputEvents[i];
+
+		if (
+			input.type !== "mousedown" &&
+			input.type !== "mousemove" &&
+			input.type !== "mouseup"
+		) { continue; }
+
+		const point = transformPoint(input.x, input.y, transform);
+		const _x = point.x;
+		const _y = point.y;
+
+		const isPointWithin = left <= _x && right >= _x && top <= _y && bottom >= _y;
+
 		if (input.type === "mousedown") {
-			const _x = input.x;
-			const _y = input.y;
-			if (left <= _x && right >= _x && top <= _y && bottom >= _y) {
+			if (isPointWithin) {
 				this.pressed = true;
 				this.scaleX = 1.2;
 				this.scaleY = 1.2;
 			}
 		}
+
 		if (input.type === "mousemove") {
 			if (!this.pressed) { return; }
 
-			const _x = input.x;
-			const _y = input.y;
-			if (left <= _x && right >= _x && top <= _y && bottom >= _y) {
+			if (isPointWithin) {
 				this.scaleX = 1.2;
 				this.scaleY = 1.2;
 			} else {
@@ -52,11 +66,12 @@ Button.prototype.input = function (inputEvents) {
 				this.scaleY = 1;
 			}
 		}
+
 		if (input.type === "mouseup") {
+			if (!this.pressed) { return; }
 			this.pressed = false;
-			const _x = input.x;
-			const _y = input.y;
-			if (left <= _x && right >= _x && top <= _y && bottom >= _y) {
+
+			if (isPointWithin) {
 				this.scaleX = 1;
 				this.scaleY = 1;
 				this.onPress();
@@ -73,6 +88,8 @@ Button.prototype.render = function (renderer) {
 	renderer.translate(this.x, this.y);
 	renderer.scale(this.scaleX, this.scaleY);
 	renderer.rotate(this.angle);
+
+	this.transform = renderer.getTransform();
 
 	const width = this.width;
 	const height = this.height;
@@ -91,10 +108,14 @@ Button.prototype.render = function (renderer) {
 
 	const text = this.text;
 	if (text !== undefined) {
-		const w = renderer.measureText(text).width;
-		const h = parseInt(renderer.font);
+		const font = this.font === undefined ? "bold 15px Helvetica" : this.font;
+		renderer.font = font;
+
+		renderer.textBaseline = "middle";
+		renderer.textAlign = "center";
+
 		renderer.fillStyle = "#000";
-		renderer.fillText(text, -w * 0.5, h * 0.3);
+		renderer.fillText(text, 0, 0);
 	}
 
 	renderer.restore();
