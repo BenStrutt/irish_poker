@@ -25,7 +25,6 @@ Deck.prototype.populateCards = function () {
 };
 
 Deck.prototype.drawCard = function () {
-	const deck = this.deck;
 	const index = Math.floor(Math.random() * this.cards.length);
 	const card = this.cards[index];
 

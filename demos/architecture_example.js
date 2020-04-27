@@ -5,7 +5,7 @@ function Application(initialPhase) {
 }
 
 Application.prototype.recieveMessage = function (id, data) {
-	this[this.phase](id, data);
+	this[this.phase].recieveMessage(id, data);
 };
 
 Application.prototype.changePhase = function (phase) {

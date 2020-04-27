@@ -1,10 +1,11 @@
 "use strict";
 
-function Prompt(label) {
+function Prompt(label, inputType, x, y) {
 	this.label = label;
+	this.inputType = inputType;
 
-	this.x = 0;
-	this.y = 0;
+	this.x = x;
+	this.y = y;
 	this.width = 200;
 	this.height = 34;
 
@@ -35,7 +36,7 @@ Prompt.prototype.input = function (inputEvents) {
 			if (current.length < 40) { this.current += input.key; };
 		} else if (keyCode === 13) {
 			connection.sendMessage({
-				type: this.label,
+				type: this.inputType,
 				input: current,
 			});
 			this.current = "";
