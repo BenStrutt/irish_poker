@@ -1,18 +1,22 @@
 "use strict";
 
+// make canvas stuff
+// application.canvas = document.createElement("canvas");
+// application.context = application.canvas.getContext("2d");
+
+const assets = new Assets();
+assets.load(ASSET_DATA, startGame);
+
 const application = new Application();
+application.setAssets(assets);
 
-application.width = 640;
-application.height = 480;
+application.setConnection(new Connection("localhost", 8080));
 
-application.canvas = document.createElement("canvas");
-application.context = application.canvas.getContext("2d");
+application.setBoard(Board);
 
-application.connection = new Connection("localhost", 8080);
-application.connection.connect = application.connect;
-application.connection.disconnect = application.disconnect;
-application.connection.reconnect = application.connect;
-application.connection.receiveMessage = application.receiveMessage;
+application.setPhase("lobby", new Lobby());
+application.setPhase("game", new Game());
+application.setPhase("game_over", new GameOver());
 
 const INPUT = [];
 document.addEventListener("keydown", (e) => {
@@ -31,8 +35,6 @@ document.addEventListener("mouseup", (e) => {
 	INPUT.push({type: "mouseup", x: e.offsetX, y: e.offsetY});
 });
 
-application.assets = new Assets();
-application.assets.load(ASSET_DATA, startGame);
 
 function startGame() {
 	loop.run();
@@ -46,7 +48,11 @@ const loop = {
 		const deltaTime = time - this.time;
 		this.time = time;
 
-		const phase = application.phases[application.phase];
-		phase.states[phase.state](INPUT, deltaTime);
+		application.input(INPUT);
+		application.process(deltaTime);
+
+		context.clearRect(0, 0, Board.Width, Board.Height);
+		application.render(context);
+
 	},
 };

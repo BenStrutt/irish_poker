@@ -1,11 +1,12 @@
 "use strict";
 
 function Lobby(app) {
-	this.app = app;
+	this.data = null;
+
 	this.state = "namePrompt"
 	this.states = {
-		namePrompt: this.namePrompt,
-		wait: this.wait,
+		namePrompt: this.namePrompt.bind(this),
+		wait: this.wait.bind(this),
 	}
 	this.prompt = new Prompt(
 		"Your name: ",
@@ -16,8 +17,9 @@ function Lobby(app) {
 }
 
 Lobby.prototype.namePrompt = function (ipt, time) {
-	console.log(this)
 
+
+	console.log(this)
 	this.prompt.input(ipt);
 	this.prompt.update(time);
 
