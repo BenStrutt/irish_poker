@@ -3,21 +3,27 @@
 const World = {
 	Width: 640,
 	Height: 480,
-}
+};
 
 const canvas = document.createElement("canvas");
+const context = canvas.getContext("2d");
+
+canvas.width = World.Width;
+canvas.height = World.Height;
+
+canvas.style.backgroundColor = "#277a2b";
+
 document.body.appendChild(canvas);
 
 const assets = new Assets();
 assets.load(ASSET_DATA, startGame);
 
 const application = new Application("lobby");
-application.setAssets(assets);
 application.setConnection(new Connection("localhost", 8080));
+application.setAssets(assets);
 application.setWorld(World);
-application.setCanvas(canvas)
 
-application.setPhase("lobby", new Lobby(World));
+application.setPhase("lobby", new Lobby());
 application.setPhase("game", new Game());
 application.setPhase("game_over", new GameOver());
 
@@ -54,8 +60,8 @@ const loop = {
 		application.input(INPUT);
 		application.process(deltaTime);
 
-		application.data.context.clearRect(0, 0, World.Width, World.Height);
-		application.render();
+		context.clearRect(0, 0, World.Width, World.Height);
+		application.render(context);
 
 		INPUT.length = 0;
 	},

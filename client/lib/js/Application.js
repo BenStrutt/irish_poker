@@ -1,10 +1,10 @@
 "use strict";
 
 function Application(initialPhase) {
-	this.data = {};
+	this.phase = initialPhase;
+	this.phases = {};
 
-	this.data.phase = initialPhase;
-	this.data.phases = {};
+	this.data = {};
 
 }
 
@@ -13,10 +13,6 @@ Application.prototype.setAssets = function (assets) {
 };
 
 Application.prototype.setConnection = function (connection) {
-	this.data.connection = connection;
-	connection.connect = this.connect.bind(this);
-	connection.disconnect = this.disconnect.bind(this);
-	connection.reconnect = this.reconnect.bind(this);
 	connection.receiveMessage = this.receiveMessage.bind(this);
 	this.sendMessage = connection.sendMessage;
 };
@@ -25,66 +21,84 @@ Application.prototype.setWorld = function (world) {
 	this.data.world = world;
 };
 
-Application.prototype.setCanvas = function (canvas) {
-	canvas.width = this.data.world.Width;
-	canvas.height = this.data.world.Height;
-	canvas.style.backgroundColor = "#277a2b";
-
-	this.data.context = canvas.getContext("2d");
-}
-
 Application.prototype.setPhase = function (key, phase) {
-	this.data.phases[key] = phase;
+	this.phases[key] = phase;
 
 	phase.data = this.data;
 	phase.sendMessage = this.sendMessage;
+
+	if (this.phase !== key) { return; }
+
+	phase.initialize({});
+
 };
 
 Application.prototype.input = function (input) {
-	const phase = this.data.phases[this.data.phase];
+	const phase = this.phases[this.phase];
 	if (phase === undefined) { return; }
 
 	phase.input(input);
 };
 
 Application.prototype.process = function (deltaTime) {
-	const phase = this.data.phases[this.data.phase];
+	const phase = this.phases[this.phase];
 	if (phase.process === undefined) { return; }
 
 	phase.process(deltaTime);
 };
 
-Application.prototype.render = function () {
-	const phase = this.data.phases[this.data.phase];
+Application.prototype.render = function (context) {
+	const phase = this.phases[this.phase];
 	if (phase.render === undefined) { return; }
 
-	phase.render();
+	phase.render(context);
 };
 
-Application.prototype.connect = function (id, data) {
-	const phase = this.data.phases[this.data.phase];
-	if (phase.connect === undefined) { return; }
+Application.prototype.receiveMessage = function (data) {
 
-	phase.connect(id, data);
-};
+	const handler = this[data.type];
+	if (handler !== undefined) {
+		handler.call(this, data);
+	}
 
-Application.prototype.disconnect = function (id, data) {
-	const phase = this.data.phases[this.data.phase];
-	if (phase.disconnect === undefined) { return; }
-
-	phase.disconnect(id, data);
-};
-
-Application.prototype.reconnect = function (id, data) {
-	const phase = this.data.phases[this.data.phase];
-	if (phase.reconnect === undefined) { return; }
-
-	phase.reconnect(id, data);
-};
-
-Application.prototype.receiveMessage = function (id, data) {
-	const phase = this.data.phases[this.data.phase];
+	const phase = this.phases[this.phase];
 	if (phase.receiveMessage === undefined) { return; }
 
-	phase.receiveMessage(id, data);
+	phase.receiveMessage(data);
+};
+
+Application.prototype.initialize = function (data) {
+	const localData = this.data;
+
+	localData.id = data.id;
+	localData.phase = data.phase;
+	localData.round = data.round;
+	localData.turn = data.turn;
+	localData.totalPlayers = data.totalPlayers;
+
+	const players = {};
+	const playersData = data.players;
+	for (const id in playersData) {
+		const player = new Player();
+		player.deserialize(playersData[id]);
+		players[id] = player;
+	}
+
+	localData.players = players;
+};
+
+Application.prototype.connect = function (data) {
+	this.data.players[data.id] = data.player;
+	this.data.totalPlayers = data.totalPlayers;
+};
+
+Application.prototype.disconnect = function (data) {
+	this.data.players[data.id].active = false;
+};
+
+Application.prototype.change_phase = function (data) {
+	this.phase = data.phase;
+	const phase = this.phases[this.phase];
+	if (phase.initialize === undefined) { return; }
+	phase.initialize(data);
 };

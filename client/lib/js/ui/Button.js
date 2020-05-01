@@ -1,9 +1,11 @@
-function Button(x, y, width, height, text, callback) {
-	this.x = x;
-	this.y = y;
+function Button(onPressCallback) {
+	this.onPress = onPressCallback;
 
-	this.width = width;
-	this.height = height;
+	this.x = 0;
+	this.y = 0;
+
+	this.width = 200;
+	this.height = 100;
 
 	this.angle = 0;
 	this.scaleX = 1;
@@ -11,15 +13,30 @@ function Button(x, y, width, height, text, callback) {
 
 	this.color = "#d9a414";
 	this.key = undefined;
-	this.text = text;
+
+	this.text = undefined;
 	this.font = undefined;
 
 	this.pressed = false;
-	this.onPress = callback;
 
 	this.transform = new DOMMatrix(); // identity matrix
 
 }
+
+Button.prototype.setText = function (text, font) {
+	this.text = text;
+	this.font = font;
+};
+
+Button.prototype.resize = function (width, height) {
+	this.width = width;
+	this.height = height;
+};
+
+Button.prototype.position = function (x, y) {
+	this.x = x;
+	this.y = y;
+};
 
 Button.prototype.input = function (inputEvents) {
 	const width = this.width;

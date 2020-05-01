@@ -3,13 +3,6 @@
 const http = require("http");
 const WebSocket = require("ws");
 
-const Message = {
-	CONNECT: 0,
-	DISCONNECT: 1,
-	RECONNECT: 2,
-	DATA: 3,
-};
-
 function Connection(ip, port) {
 	this.logging = true;
 
@@ -23,9 +16,9 @@ function Connection(ip, port) {
 	WSS.on("connection", this.initialize.bind(this));
 }
 
-Connection.prototype.connect = (id, data) => console.log(`No connect method set: ${JSON.stringify({id: id, data: data})}`);
-Connection.prototype.disconnect = (id, data) => console.log(`No disconnect method set: ${JSON.stringify({id: id, data: data})}`);
-Connection.prototype.reconnect = (id, data) => console.log(`No reconnect method set: ${JSON.stringify({id: id, data: data})}`);
+Connection.prototype.connect = (id) => console.log(`No connect method set: ${id}`);
+Connection.prototype.disconnect = (id) => console.log(`No disconnect method set: ${id}`);
+Connection.prototype.reconnect = (id) => console.log(`No reconnect method set: ${id}`);
 Connection.prototype.receiveMessage = (id, data) => console.log(`No receiveMessage method set: ${JSON.stringify({id: id, data: data})}`);
 
 Connection.prototype.initialize = function (ws, req) {
@@ -38,12 +31,12 @@ Connection.prototype.initialize = function (ws, req) {
 
 	this.log(`${id}: ${reconnect ? "RECONNECT" : "CONNECT"}`);
 
-	const message = {
-		type: reconnect ? Message.RECONNECT : Message.CONNECT,
-		info: {id: id, data: {}},
-	};
-	(reconnect ? this.reconnect(id, message.info.data) : this.connect(id, message.info.data));
-	this.broadcast(message);
+	if (reconnect) {
+		this.reconnect(id);
+	} else {
+		this.connect(id);
+	}
+
 };
 
 Connection.prototype.processSocketRequest = function (ws, req) {
@@ -74,32 +67,35 @@ Connection.prototype.processSocketRequest = function (ws, req) {
 
 Connection.prototype.close = function (id) {
 	this.log(`${id}: DISCONNECT`);
-	const message = {
-		type: Message.DISCONNECT,
-		info: {id: id, data: {}},
-	};
-	this.disconnect(id, message.info.data);
-	this.broadcast(message, id);
+	this.disconnect(id);
 };
 
 Connection.prototype.message = function (id, data) {
 	this.log(`${id}: ${data}`);
-	const message = {
-		type: Message.DATA,
-		info: {id: id, data: JSON.parse(data)},
-	};
-
-	this.receiveMessage(id, message.info.data);
-	this.broadcast(message);
+	this.receiveMessage(id, JSON.parse(data));
 };
 
-Connection.prototype.broadcast = function (message, excludeId) {
+Connection.prototype.broadcast = function (message, excludeIDs) {
+	if (excludeIDs === undefined) {
+		excludeIDs = [];
+	}
+
 	const clients = this.clients;
 	const messageString = JSON.stringify(message);
 	for (const id in clients) {
-		if (id === String(excludeId)) { continue; }
+		if (excludeIDs.indexOf(Number(id)) >= 0) { continue; }
 		const client = clients[id];
 		if (client.readyState !== WebSocket.OPEN) { continue; }
+		client.send(messageString);
+	}
+};
+
+Connection.prototype.sendMessage = function (message, includeIDs) {
+	const clients = this.clients;
+	const messageString = JSON.stringify(message);
+	for (const id in includeIDs) {
+		const client = clients[id];
+		if (client === undefined || client.readyState !== WebSocket.OPEN) { continue; }
 		client.send(messageString);
 	}
 };
