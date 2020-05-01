@@ -1,119 +1,90 @@
 "use strict";
 
 function Application(initialPhase) {
-	this.data = {
-		id: null,
-	};
+	this.data = {};
 
-	this.phase = initialPhase;
-	this.phases = {};
+	this.data.phase = initialPhase;
+	this.data.phases = {};
 
 }
-
-Application.prototype.getID = function () {
-	return this.connection.id;
-};
 
 Application.prototype.setAssets = function (assets) {
 	this.data.assets = assets;
 };
 
 Application.prototype.setConnection = function (connection) {
-	connection.connect = this.connect;
-	connection.disconnect = this.disconnect;
-	connection.reconnect = this.reconnect;
-	connection.receiveMessage = this.receiveMessage;
+	this.data.connection = connection;
+	connection.connect = this.connect.bind(this);
+	connection.disconnect = this.disconnect.bind(this);
+	connection.reconnect = this.reconnect.bind(this);
+	connection.receiveMessage = this.receiveMessage.bind(this);
 	this.sendMessage = connection.sendMessage;
 };
 
-Application.prototype.setConnection = function (board) {
-	this.data.board = board;
+Application.prototype.setWorld = function (world) {
+	this.data.world = world;
 };
 
-Application.prototype.addPhase = function (key, phase) {
-	this.phases[key] = phase;
+Application.prototype.setCanvas = function (canvas) {
+	canvas.width = this.data.world.Width;
+	canvas.height = this.data.world.Height;
+	canvas.style.backgroundColor = "#277a2b";
+
+	this.data.context = canvas.getContext("2d");
+}
+
+Application.prototype.setPhase = function (key, phase) {
+	this.data.phases[key] = phase;
 
 	phase.data = this.data;
 	phase.sendMessage = this.sendMessage;
 };
 
 Application.prototype.input = function (input) {
-	const phase = this.phases[this.phase];
-	if (phase.input === undefined) { return; }
+	const phase = this.data.phases[this.data.phase];
+	if (phase === undefined) { return; }
 
 	phase.input(input);
 };
 
 Application.prototype.process = function (deltaTime) {
-	const phase = this.phases[this.phase];
+	const phase = this.data.phases[this.data.phase];
 	if (phase.process === undefined) { return; }
 
 	phase.process(deltaTime);
 };
 
-Application.prototype.render = function (renderer) {
-	const phase = this.phases[this.phase];
+Application.prototype.render = function () {
+	const phase = this.data.phases[this.data.phase];
 	if (phase.render === undefined) { return; }
 
-	phase.render(renderer);
+	phase.render();
 };
 
 Application.prototype.connect = function (id, data) {
-	if (this.data.id === null) { this.data.id = id; }
-
-	const phase = this.phases[this.phase];
+	const phase = this.data.phases[this.data.phase];
 	if (phase.connect === undefined) { return; }
 
 	phase.connect(id, data);
 };
 
-Application.prototype.diconnect = function (id, data) {
-	const phase = this.phases[this.phase];
-	if (phase.diconnect === undefined) { return; }
+Application.prototype.disconnect = function (id, data) {
+	const phase = this.data.phases[this.data.phase];
+	if (phase.disconnect === undefined) { return; }
 
-	phase.diconnect(id, data);
+	phase.disconnect(id, data);
 };
 
 Application.prototype.reconnect = function (id, data) {
-	const phase = this.phases[this.phase];
+	const phase = this.data.phases[this.data.phase];
 	if (phase.reconnect === undefined) { return; }
 
 	phase.reconnect(id, data);
 };
 
-Application.prototype.recieveMessage = function (id, data) {
-	const phase = this.phases[this.phase];
-	if (phase.recieveMessage === undefined) { return; }
+Application.prototype.receiveMessage = function (id, data) {
+	const phase = this.data.phases[this.data.phase];
+	if (phase.receiveMessage === undefined) { return; }
 
-	phase.recieveMessage(id, data);
-};
-
-Application.prototype.addNewPlayer = function (id, data) {
-	this.phase = data.phase;
-	this.round = data.round;
-	this.turn = data.turn;
-	this.totalPlayers = data.totalPlayers;
-	this.players = {};
-	for (const id in data.players) {
-		const player = new Player();
-		player.deserialize(data.players[id]);
-		this.players[id] = player;
-	}
-};
-
-Application.prototype.initializeGameData = function (data) {
-	this.phase = data.phase;
-	this.round = data.round;
-	this.turn = data.turn;
-	this.totalPlayers = data.totalPlayers;
-	this.players = {};
-	for (const id in data.players) {
-		const player = new Player();
-		player.deserialize(data.players[id]);
-		this.players[id] = player;
-	}
-};
-
-Application.prototype.drawCards = function () {
-	for (const id in this.players) { this.players[id].cards.push(new Card); }
+	phase.receiveMessage(id, data);
 };

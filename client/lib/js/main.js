@@ -1,20 +1,23 @@
 "use strict";
 
-// make canvas stuff
-// application.canvas = document.createElement("canvas");
-// application.context = application.canvas.getContext("2d");
+const World = {
+	Width: 640,
+	Height: 480,
+}
+
+const canvas = document.createElement("canvas");
+document.body.appendChild(canvas);
 
 const assets = new Assets();
 assets.load(ASSET_DATA, startGame);
 
-const application = new Application();
+const application = new Application("lobby");
 application.setAssets(assets);
-
 application.setConnection(new Connection("localhost", 8080));
+application.setWorld(World);
+application.setCanvas(canvas)
 
-application.setBoard(Board);
-
-application.setPhase("lobby", new Lobby());
+application.setPhase("lobby", new Lobby(World));
 application.setPhase("game", new Game());
 application.setPhase("game_over", new GameOver());
 
@@ -51,8 +54,9 @@ const loop = {
 		application.input(INPUT);
 		application.process(deltaTime);
 
-		context.clearRect(0, 0, Board.Width, Board.Height);
-		application.render(context);
+		application.data.context.clearRect(0, 0, World.Width, World.Height);
+		application.render();
 
+		INPUT.length = 0;
 	},
 };

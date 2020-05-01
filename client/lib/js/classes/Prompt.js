@@ -20,7 +20,7 @@ function Prompt(label, inputType, x, y) {
 	this.showCursor = true;
 }
 
-Prompt.prototype.input = function (inputEvents) {
+Prompt.prototype.input = function (inputEvents, connection) {
 	const current = this.current;
 
 	for (let i = 0; i < inputEvents.length; i++) {
@@ -45,7 +45,7 @@ Prompt.prototype.input = function (inputEvents) {
 
 }
 
-Prompt.prototype.update = function (deltaTime) {
+Prompt.prototype.process = function (deltaTime) {
 	if ((this.time += deltaTime) >= this.timeLimit) {
 		this.showCursor = !this.showCursor;
 		this.time = 0;

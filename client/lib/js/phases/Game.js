@@ -3,13 +3,21 @@
 function Game() {
 	this.data = null;
 	this.state = "deal";
-	this.states = {
-		wait: this.wait,
-		choose: this.choose,
-		give: this.give,
-	}
 }
 
-Game.prototype.flipCard = function (id) {
-	this.data.players.cards[id].faceUp = true;
-}
+Game.prototype.deal = function () {
+	for (const id in this.players) { this.players[id].cards.push(new Card); }
+	this.state = (this.data.turn === this.data.connection.id) ? "choose" : "wait";
+};
+
+Game.prototype.wait = function () {
+
+};
+
+Game.prototype.choose = function () {
+
+};
+
+Game.prototype.give = function () {
+
+};

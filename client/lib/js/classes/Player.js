@@ -1,8 +1,8 @@
 "use strict";
 
-function Player(x, y) {
-	this.x = x;
-	this.y = y;
+function Player() {
+	this.x = null;
+	this.y = null;
 
 	this.angle = 0;
 	this.scaleX = 0.5;
@@ -19,8 +19,8 @@ Player.prototype.deserialize = function(player) {
 	this.totalDrinks = player.totalDrinks;
 	this.name = player.name;
 	this.active = player.active;
-	this.positionX = player.positionX;
-	this.positionY = player.positionY;
+	this.x = player.x;
+	this.y = player.y;
 }
 
 Player.prototype.deserializeCards = function(player) {

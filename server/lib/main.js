@@ -24,7 +24,11 @@ function connect(id, data) {
 	if (game.phase !== "lobby" && game.players[id] === undefined) { return; }
 
 	if (game.players[id] === undefined) {
-		game.players[id] = {cards: []};
+		game.players[id] = {};
+		game.players[id].cards = [];
+		game.players[id].x = null;
+		game.players[id].y = null;
+		game.players[id].name = null;
 		game.totalPlayers++;
 	}
 
@@ -40,15 +44,17 @@ function disconnect(id, data) {
 	game.players[id].active = false;
 }
 
+function reconnect(id, data) {
+	
+}
+
 function receiveMessage(id, data) {
 	switch (data.type) {
 		case "set_name":
 			game.players[id].name = data.input;
-			data.players[id].name = data.input;
 			break;
 		case "start":
 			game.phase = "game";
-			data.phase = "game";
 			dealCards();
 			break;
 	}
