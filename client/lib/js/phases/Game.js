@@ -51,8 +51,6 @@ Game.prototype.process = function (time) {
 			// when done animating, run the following code:
 			const player = this.data.players[this.data.turn];
 
-			console.log(player.isCorrect(this.data.round));
-
 			if (player.isCorrect(this.data.round)) {
 				this.state = (this.data.turn === this.data.id) ? "give" : "receive";
 				player.drinksToGive = this.data.round * 2;

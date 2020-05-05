@@ -55,9 +55,6 @@ Player.prototype.isCorrect = function (round) {
 			return this.guesses[1] === this.evalHighLow();
 			break;
 		case 3:
-			console.log(this.guesses[2]);
-			console.log(this.evalInsideOutside());
-
 			return this.guesses[2] === this.evalInsideOutside();
 			break;
 		case 4:
