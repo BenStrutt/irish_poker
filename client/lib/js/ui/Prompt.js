@@ -53,6 +53,8 @@ Prompt.prototype.input = function (inputEvents) {
 		} else if (keyCode === 32 || keyCode >= 65 && keyCode <= 90) {
 			if (current.length < 40) { this.text += input.key; };
 		} else if (keyCode === 13) {
+			if (this.text === "") { return; }
+			
 			this.onSubmit(this.text);
 			this.text = "";
 		}
@@ -91,6 +93,8 @@ Prompt.prototype.render = function (renderer) {
 		text = this.text + (this.showCursor ? this.cursor : "");
 	}
 
+	renderer.textBaseline = "alphabetic";
+	renderer.textAlign = "start";
 	renderer.fillText(
 		text,
 		x,

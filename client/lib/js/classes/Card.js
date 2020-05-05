@@ -8,21 +8,24 @@ function Card(x, y) {
 	this.height = 190;
 
 	this.angle = 0;
-	this.scaleX = 1;
-	this.scaleY = 1;
+	this.scaleX = 0.75;
+	this.scaleY = 0.75;
 
 	this.suit = "";
 	this.value = 0;
-	this.faceUp = false;
+
+	this.faceDown = true;
 
 	this.transform = new DOMMatrix();
 }
 
-Card.prototype.deserialize = function (card) {
-	if (card.faceUp === false) { return; }
-	this.suit = card.suit;
-	this.value = card.value;
-	this.faceUp = card.faceUp;
+Card.prototype.deserialize = function (data) {
+	this.faceDown = data.faceDown
+
+	if (this.faceDown) { return; }
+
+	this.suit = data.suit;
+	this.value = data.value;
 };
 
 Card.prototype.getRank = function () {
@@ -42,7 +45,7 @@ Card.prototype.getColor = function () {
 Card.prototype.render = function (renderer) {
 	const value = this.value;
 	let spriteKey;
-	if (this.faceUp === false) {
+	if (this.value === 0) {
 		spriteKey = "cardBack_blue5";
 	} else {
 		const suit = this.suit;

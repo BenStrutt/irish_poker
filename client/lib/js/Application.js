@@ -71,7 +71,7 @@ Application.prototype.initialize = function (data) {
 	const localData = this.data;
 
 	localData.id = data.id;
-	localData.phase = data.phase;
+	this.phase = data.phase;
 	localData.round = data.round;
 	localData.turn = data.turn;
 	localData.totalPlayers = data.totalPlayers;
@@ -88,7 +88,10 @@ Application.prototype.initialize = function (data) {
 };
 
 Application.prototype.connect = function (data) {
-	this.data.players[data.id] = data.player;
+	if (this.data.players[data.id] === undefined) {
+		this.data.players[data.id] = new Player();
+	}
+	this.data.players[data.id].deserialize(data.player);
 	this.data.totalPlayers = data.totalPlayers;
 };
 
@@ -97,8 +100,7 @@ Application.prototype.disconnect = function (data) {
 };
 
 Application.prototype.change_phase = function (data) {
-	this.phase = data.phase;
+	this.phase = data.value;
 	const phase = this.phases[this.phase];
-	if (phase.initialize === undefined) { return; }
 	phase.initialize(data);
 };

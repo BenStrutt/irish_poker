@@ -3,6 +3,7 @@
 function Card(suit, value) {
 	this.suit = suit;
 	this.value = value;
+	this.faceDown = true;
 }
 
 Card.prototype.getRank = function (value) {

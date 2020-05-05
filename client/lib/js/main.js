@@ -27,6 +27,9 @@ application.setPhase("lobby", new Lobby());
 application.setPhase("game", new Game());
 application.setPhase("game_over", new GameOver());
 
+application.phases.lobby.context = context;
+application.phases.game.context = context;
+
 const INPUT = [];
 document.addEventListener("keydown", (e) => {
 	INPUT.push({type: "keydown", keyCode: e.keyCode, key: e.key});

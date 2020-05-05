@@ -1,46 +1,39 @@
-function Button(onPressCallback) {
+"use strict";
+
+function Text(onPressCallback) {
 	this.onPress = onPressCallback;
+	this.text = null;
 
-	this.x = 0;
-	this.y = 0;
+	this.x = null;
+	this.y = null;
 
-	this.width = 200;
-	this.height = 100;
+	this.size = null;
+	this.font = null;
+	this.color = null;
 
 	this.angle = 0;
 	this.scaleX = 1;
 	this.scaleY = 1;
 
-	this.color = "#d9a414";
-	this.key = undefined;
-
-	this.text = undefined;
-	this.font = undefined;
-
 	this.pressed = false;
 
 	this.transform = new DOMMatrix(); // identity matrix
-
 }
 
-Button.prototype.setText = function (text, font) {
-	this.text = text;
-	this.font = font;
-};
-
-Button.prototype.resize = function (width, height) {
-	this.width = width;
-	this.height = height;
-};
-
-Button.prototype.position = function (x, y) {
+Text.prototype.position = function (x, y) {
 	this.x = x;
 	this.y = y;
 };
 
-Button.prototype.input = function (inputEvents) {
-	const width = this.width;
-	const height = this.height;
+Text.prototype.style = function (size, font, color) {
+	this.size = size;
+	this.font = font;
+	this.color = color;
+};
+
+Text.prototype.input = function (inputEvents, context) {
+	const width = context.measureText(this.text).width;
+	const height = this.size;
 
 	const left = -width * 0.5;
 	const right = width * 0.5;
@@ -97,7 +90,7 @@ Button.prototype.input = function (inputEvents) {
 	}
 };
 
-Button.prototype.render = function (renderer) {
+Text.prototype.render = function (renderer) {
 	renderer.save();
 
 	renderer.translate(this.x, this.y);
@@ -106,32 +99,12 @@ Button.prototype.render = function (renderer) {
 
 	this.transform = renderer.getTransform();
 
-	const width = this.width;
-	const height = this.height;
+	renderer.font = `${this.size}px ${this.font}`;
+	renderer.fillStyle = this.color;
+	renderer.textBaseline = "middle";
+	renderer.textAlign = "center";
 
-	const color = this.color;
-	if (color !== undefined) {
-		renderer.fillStyle = color;
-		renderer.fillRect(-width * 0.5, -height * 0.5, width, height);
-	}
-
-	const key = this.key;
-	if (key !== undefined) {
-		const image = assets.get(key);
-		renderer.drawImage(image, -width * 0.5, -height * 0.5, width, height);
-	}
-
-	const text = this.text;
-	if (text !== undefined) {
-		const font = this.font === undefined ? "bold 15px Helvetica" : this.font;
-		renderer.font = font;
-
-		renderer.textBaseline = "middle";
-		renderer.textAlign = "center";
-
-		renderer.fillStyle = "#000";
-		renderer.fillText(text, 0, 0);
-	}
+	renderer.fillText(this.text, 0, 0);
 
 	renderer.restore();
 };

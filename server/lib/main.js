@@ -27,6 +27,10 @@ function connect(id) {
 		game.players[id] = {
 			name: null,
 			cards: [],
+			outstandingDrinks: 0,
+			totalDrinks: 0,
+			drinksToGive: 0,
+			guesses: [],
 		};
 		game.totalPlayers++;
 	}
@@ -54,6 +58,8 @@ function disconnect(id) {
 }
 
 function receiveMessage(id, data) {
+	const currentPlayer = game.players[id];
+
 	switch (data.type) {
 		case "set_name":
 			game.players[id].name = data.input;
@@ -62,30 +68,65 @@ function receiveMessage(id, data) {
 			break;
 		case "start":
 			game.phase = "game";
-			connection.broadcast({type: "change_phase", value: "game"});
-			break;
-		case "guess": {
-			// handle guess
-			return;
-			const card = game.deck.drawCard();
+			dealCards();
 
-			const isCorrect = evaluateGuess(data.guess, card);
+			const cards = [];
+			for (const id in game.players) {cards.push(game.players[id].cards[0]);}
+
+			connection.broadcast({
+				type: "change_phase",
+				value: "game",
+				players: game.players
+			});
+			break;
+		case "guess":
+			const card = currentPlayer.cards[game.round - 1];
+			const isCorrect = evaluateGuess[game.round](data.guess);
 
 			if (!isCorrect) {
-				const drinks = game.round * 2;
-				data.drinks = drinks;
-				game.players[id].drinks += drinks;
+				currentPlayer.totalDrinks += game.round * 2;
+				currentPlayer.outstandingDrinks += game.round * 2;
+				game.turn++;
+				if (game.turn >= game.totalPlayers) {
+					game.turn = 0;
+					game.round++;
+					dealCards();
+				}
+			} else {
+				currentPlayer.drinksToGive = game.round * 2;
 			}
 
-			data.value = card;
-			data.correct = isCorrect;
+			card.faceDown = false;
+			currentPlayer.guesses.push(data.guess);
 
-			game.players[id].cards.push(card);
-			data.id = id;
-			data.value = card;
+			connection.broadcast({
+				type: "guess",
+				id: id,
+				guess: data.guess,
+				card: card,
+			});
+			break;
+		case "give_drink":
+			game.players[data.id].outstandingDrinks++;
+			game.players[data.id].totalDrinks++;
+			currentPlayer.drinksToGive--;
+			if (currentPlayer.drinksToGive === 0) {
+				game.turn++;
+				if (game.turn >= game.totalPlayers) {
+					game.turn = 0;
+					game.round++;
+					dealCards();
+				}
+			}
+			connection.broadcast({type: "receive_drink", id: data.id});
+			break;
+		case "take_drink":
+			const outstandingDrinks = currentPlayer.outstandingDrinks
+			if (outstandingDrinks === 0) { return; }
 
-			connection.broadcast(data);
-		}
+			currentPlayer.outstandingDrinks--;
+			connection.broadcast({type: "took_drink", id: id});
+			break;
 	}
 }
 
@@ -111,4 +152,46 @@ function getPlayerIDs(exclude) {
 	}
 
 	return ids;
+}
+
+function dealCards() {
+	const players = game.players;
+	for (const id in players) {
+		const cards = players[id].cards;
+		cards.push(game.deck.drawCard());
+	}
+}
+
+const evaluateGuess = {
+	1: function (guess) {
+		const card = game.players[game.turn].cards[0];
+		return guess === card.getColor();
+	},
+
+	2: function (guess) {
+		const card1 = game.players[game.turn].cards[0].value;
+		const card2 = game.players[game.turn].cards[1].value;
+
+		if (card1 === card2) { return guess === "same"; }
+		if (card1 > card2) { return guess === "lower"; }
+		return guess === "higher";
+	},
+
+	3: function (guess) {
+		const cards = game.players[game.turn].cards;
+		const values = [];
+		for (let i = 0; i < 2; i++) { values.push(cards[i].value); }
+		values.sort((a,b)=>a-b)
+
+		if (cards[2].value === values[0] || cards[2].value === values[1]) { return guess === "same"; }
+
+		if (cards[2].value > values[0] && cards[2].value < values[1]) { return guess === "inside"; }
+
+		if (cards[2].value > values[0] && cards[2].value < values[1]) { return guess === "outside"; }
+	},
+
+	4: function (guess) {
+		const card = game.players[game.turn].cards[3];
+		return guess === card.suit;
+	},
 }
