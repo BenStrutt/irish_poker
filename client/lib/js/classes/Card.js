@@ -11,6 +11,8 @@ function Card(x, y) {
 	this.scaleX = 0.75;
 	this.scaleY = 0.75;
 
+	this.originScale = 0.75;
+
 	this.suit = "";
 	this.value = 0;
 
@@ -45,7 +47,7 @@ Card.prototype.getColor = function () {
 Card.prototype.render = function (renderer) {
 	const value = this.value;
 	let spriteKey;
-	if (this.value === 0) {
+	if (this.faceDown) {
 		spriteKey = "cardBack_blue5";
 	} else {
 		const suit = this.suit;
@@ -61,14 +63,14 @@ Card.prototype.render = function (renderer) {
 
 	this.transform = renderer.getTransform();
 
-	const image = assets.get(spriteKey);
+	const image = assets.getImage(spriteKey);
 	const width = image.width;
 	const height = image.height;
 	renderer.drawImage(image, -width * 0.5, -height * 0.5, width, height);
 
 	renderer.restore();
 
-}
+};
 
 Card.prototype.input = function (inputEvents) {
 	const width = this.width;
@@ -99,21 +101,11 @@ Card.prototype.input = function (inputEvents) {
 		if (input.type === "mousedown") {
 			if (isPointWithin) {
 				this.pressed = true;
-				this.scaleX = 1.2;
-				this.scaleY = 1.2;
 			}
 		}
 
 		if (input.type === "mousemove") {
 			if (!this.pressed) { return; }
-
-			if (isPointWithin) {
-				this.scaleX = 1.2;
-				this.scaleY = 1.2;
-			} else {
-				this.scaleX = 1;
-				this.scaleY = 1;
-			}
 		}
 
 		if (input.type === "mouseup") {
@@ -121,12 +113,22 @@ Card.prototype.input = function (inputEvents) {
 			this.pressed = false;
 
 			if (isPointWithin) {
-				this.scaleX = 1;
-				this.scaleY = 1;
-				console.log(this.getColor());
+				this.flip();
 			}
 		}
 
 	}
 
+};
+
+Card.prototype.flip = function () {
+	assets.getSound("draw").play();
+
+	const scale = this.originScale;
+	tween.create(this)
+		.to({scaleX: 0}, 100)
+		.call(function () {
+			this.faceDown = !this.faceDown;
+		}.bind(this))
+		.to({scaleX: scale}, 100);
 };

@@ -1,30 +1,52 @@
 "use strict";
 
 function Assets() {
-	this.folder = "assets/images/";
-	this.cache = {};
+	this.imageCache = {};
+	this.soundCache = {};
 }
 
 Assets.prototype.load = function (sources, callback) {
-	const folder = this.folder;
-	const cache = this.cache;
+	const imagePath = "assets/images/";
+	const soundPath = "assets/sounds/";
+
+	const imageCache = this.imageCache;
+	const soundCache = this.soundCache;
+
 	let loading = 0;
 	let loaded = 0;
 
 	for (const key in sources) {
-		const image = new Image();
-		image.src = folder + sources[key];
+		const fileName = sources[key];
+		const extension = fileName.split(".")[1];
 
 		++loading;
-		image.onload = function() {
-			if (++loaded < loading) { return; }
-			callback();
-		};
 
-		cache[key] = image;
+		if (extension === "png") {
+			const image = new Image();
+			image.src = imagePath + fileName;
+			imageCache[key] = image;
+			image.onload = function() {
+				if (++loaded < loading) { return; }
+				callback();
+			};
+		} else {
+			const sound = new Audio();
+			sound.src = soundPath + fileName;
+			soundCache[key] = sound;
+			sound.oncanplaythrough = function() {
+				if (++loaded < loading) { return; }
+				callback();
+			};
+		}
+
 	}
+
 };
 
-Assets.prototype.get = function (key) {
-	return this.cache[key];
+Assets.prototype.getImage = function (key) {
+	return this.imageCache[key];
+};
+
+Assets.prototype.getSound = function (key) {
+	return this.soundCache[key];
 };
