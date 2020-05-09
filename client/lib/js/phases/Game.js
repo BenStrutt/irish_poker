@@ -18,6 +18,11 @@ function Game() {
 Game.prototype.input = function (input) {
 	this.drinkButton.input(input);
 
+	for (const id in this.data.players) {
+		const player = this.data.players[id];
+		player.input(input);
+	}
+
 	switch (this.state) {
 		case "choose":
 			for (let i = 0; i < this.roundButtons[this.data.round].length; i++) {

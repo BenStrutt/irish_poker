@@ -1,4 +1,8 @@
 const ASSET_DATA = {
+	song: "song.mp3",
+	draw: "draw.wav",
+
+	table: "table.png",
 	cardBack_blue1: "cardBack_blue1.png",
 	cardBack_blue2: "cardBack_blue2.png",
 	cardBack_blue3: "cardBack_blue3.png",

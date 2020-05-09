@@ -11,7 +11,7 @@ const context = canvas.getContext("2d");
 canvas.width = World.Width;
 canvas.height = World.Height;
 
-canvas.style.backgroundColor = "#277a2b";
+canvas.style.backgroundColor = "#000";
 
 document.body.appendChild(canvas);
 
@@ -31,12 +31,22 @@ application.phases.lobby.context = context;
 application.phases.game.context = context;
 application.phases.game_over.context = context;
 
+const flags = {
+	loaded: false,
+	touched: false,
+	music: false,
+};
+
 const INPUT = [];
 document.addEventListener("keydown", (e) => {
+	flags.touched = true;
+	startMusic();
 	INPUT.push({type: "keydown", keyCode: e.keyCode, key: e.key});
 });
 
 document.addEventListener("mousedown", (e) => {
+	flags.touched = true;
+	startMusic();
 	INPUT.push({type: "mousedown", x: e.offsetX, y: e.offsetY});
 });
 
@@ -49,7 +59,19 @@ document.addEventListener("mouseup", (e) => {
 });
 
 
+function startMusic() {
+	if (!flags.touched) { return; }
+	if (flags.music) { return; }
+	flags.music = true;
+	const bgmusic = assets.getSound("song");
+	bgmusic.loop = true;
+	bgmusic.volume = 0.01;
+	bgmusic.play();
+}
+
 function startGame() {
+	flags.loaded = true;
+	startMusic();
 	loop.run();
 }
 
@@ -64,7 +86,9 @@ const loop = {
 		application.input(INPUT);
 		application.process(deltaTime);
 
-		context.clearRect(0, 0, World.Width, World.Height);
+		tween.update(deltaTime);
+
+		context.drawImage(assets.getImage("table"), 0, 0, World.Width, World.Height);
 		application.render(context);
 
 		INPUT.length = 0;
