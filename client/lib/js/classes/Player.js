@@ -17,6 +17,7 @@ function Player() {
 	this.guesses = [];
 
 	this.nameDisplay = new Text();
+
 	this.uiText = new Text();
 }
 
@@ -84,7 +85,7 @@ Player.prototype.evalInsideOutside = function () {
 
 	if (cards[2].value > values[0] && cards[2].value < values[1]) { return "inside"; }
 
-	if (cards[2].value < values[0] && cards[2].value > values[1]) { return "outside"; }
+	return "outside";
 };
 
 Player.prototype.reset = function () {
@@ -115,7 +116,7 @@ Player.prototype.render = function (renderer) {
 	renderer.scale(this.scaleX, this.scaleY);
 
 	const cards = this.cards;
-	const margin = 55; // 140 is card width
+	const margin = 30; // 140 is card width
 	const originX = -(cards.length - 1) * margin * 0.5;
 	for (let i = 0; i < cards.length; i++) {
 		const card = cards[i];

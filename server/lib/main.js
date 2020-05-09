@@ -90,7 +90,7 @@ function receiveMessage(id, data) {
 				if (game.turn >= game.totalPlayers) {
 					game.turn = 0;
 					game.round++;
-					dealCards();
+					if (game.round <= 4) { dealCards(); }
 				}
 			} else {
 				currentPlayer.drinksToGive = game.round * 2;
@@ -105,6 +105,8 @@ function receiveMessage(id, data) {
 				guess: data.guess,
 				card: card,
 			});
+
+			if (game.round > 4) { game.phase = "game_over"; return; }
 			break;
 		case "give_drink":
 			game.players[data.id].outstandingDrinks++;
@@ -115,6 +117,7 @@ function receiveMessage(id, data) {
 				if (game.turn >= game.totalPlayers) {
 					game.turn = 0;
 					game.round++;
+					if (game.round > 4) { game.phase = "game_over"; return; }
 					dealCards();
 				}
 			}
@@ -126,6 +129,12 @@ function receiveMessage(id, data) {
 
 			currentPlayer.outstandingDrinks--;
 			connection.broadcast({type: "took_drink", id: id});
+			break;
+		case "end_game":
+			connection.broadcast({
+				type: "change_phase",
+				value: "game_over",
+			});
 			break;
 	}
 }
@@ -187,7 +196,7 @@ const evaluateGuess = {
 
 		if (cards[2].value > values[0] && cards[2].value < values[1]) { return guess === "inside"; }
 
-		if (cards[2].value > values[0] && cards[2].value < values[1]) { return guess === "outside"; }
+		return guess === "outside";
 	},
 
 	4: function (guess) {

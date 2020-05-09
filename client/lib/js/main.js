@@ -29,6 +29,7 @@ application.setPhase("game_over", new GameOver());
 
 application.phases.lobby.context = context;
 application.phases.game.context = context;
+application.phases.game_over.context = context;
 
 const INPUT = [];
 document.addEventListener("keydown", (e) => {

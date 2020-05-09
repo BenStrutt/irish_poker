@@ -11,6 +11,8 @@ function Text(onPressCallback) {
 	this.font = null;
 	this.color = null;
 
+	this.defaultColor = null;
+
 	this.angle = 0;
 	this.scaleX = 1;
 	this.scaleY = 1;
@@ -29,6 +31,7 @@ Text.prototype.style = function (size, font, color) {
 	this.size = size;
 	this.font = font;
 	this.color = color;
+	this.defaultColor = color;
 };
 
 Text.prototype.input = function (inputEvents, context) {
@@ -62,6 +65,7 @@ Text.prototype.input = function (inputEvents, context) {
 				this.pressed = true;
 				this.scaleX = 1.2;
 				this.scaleY = 1.2;
+				this.color = "#fcec03"
 			}
 		}
 

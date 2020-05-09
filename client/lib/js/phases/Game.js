@@ -60,6 +60,7 @@ Game.prototype.process = function (time) {
 				if (this.data.turn >= this.data.totalPlayers) {
 					this.data.turn = 0;
 					this.data.round++;
+					if (this.data.round > 4) { this.sendMessage({type: "end_game"}); return; }
 					this.dealCards();
 				}
 				this.setState();
@@ -135,6 +136,10 @@ Game.prototype.receiveMessage = function (data) {
 				if (localData.turn >= localData.totalPlayers) {
 					localData.turn = 0;
 					localData.round++;
+					if (localData.round > 4 && localData.id === 0) {
+						this.sendMessage({type: "end_game"});
+						return;
+					}
 					this.dealCards();
 				}
 				this.setState();
