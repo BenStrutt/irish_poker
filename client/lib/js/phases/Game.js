@@ -77,13 +77,13 @@ Game.prototype.render = function (renderer) {
 			this.statusMessage.render(renderer);
 			break;
 		case "give":
-			this.statusMessage.position(this.statusMessage.x, this.statusMessage.y - 10);
+			this.statusMessage.position(this.statusMessage.x, this.statusMessage.y - 25);
 			this.statusMessage.text = `You have ${currentPlayer.drinksToGive} drinks to give.`;
 			this.statusMessage.render(renderer);
-			this.statusMessage.position(this.statusMessage.x, this.statusMessage.y + 20);
+			this.statusMessage.position(this.statusMessage.x, this.statusMessage.y + 50);
 			this.statusMessage.text = `Click a player's name to give them a drink.`;
 			this.statusMessage.render(renderer);
-			this.statusMessage.position(this.statusMessage.x, this.statusMessage.y - 10);
+			this.statusMessage.position(this.statusMessage.x, this.statusMessage.y - 25);
 			break;
 		case "receive":
 			this.statusMessage.text = `${currentPlayer.name} is giving drinks`;
@@ -127,7 +127,7 @@ Game.prototype.receiveMessage = function (data) {
 				.call(function () {
 					const player = this.data.players[this.data.turn];
 					const name = (this.data.turn === this.data.id) ? "You" : player.name;
-					this.statusMessage.position(this.statusMessage.x, this.statusMessage.y - 63);
+						this.statusMessage.position(this.statusMessage.x, this.statusMessage.y - 150);
 					this.statusMessage.text = `${name} chose ${player.guesses[this.data.round - 1]}!`
 				}.bind(this))
 				.wait(700)
@@ -154,7 +154,7 @@ Game.prototype.receiveMessage = function (data) {
 					scaleY: originHeight,
 				}, 400)
 				.call(function () {
-					this.statusMessage.position(this.statusMessage.x, this.statusMessage.y + 63);
+					this.statusMessage.position(this.statusMessage.x, this.statusMessage.y + 150);
 				}.bind(this))
 				.call(this.guessEval.bind(this));
 			break;
@@ -197,7 +197,7 @@ Game.prototype.initialize = function (data) {
 	const width = this.data.world.Width;
 	const height = this.data.world.Height;
 	statusMessage.position(width * 0.5, height * 0.5);
-	statusMessage.style(19, "Roboto, sans-serif", "#FFF");
+	statusMessage.style(40, "Roboto, sans-serif", "#FFF");
 
 	for (const id in this.data.players) {
 		const player = this.data.players[id];
@@ -242,7 +242,7 @@ Game.prototype.setButtons = function () {
 
 	this.drinkButton.key = "button_take_drink";
 	this.drinkButton.resize(201, 101);
-	this.drinkButton.position(width * 0.9, height * 0.05);
+	this.drinkButton.position(width * 0.94, height * 0.06);
 
 	const buttonTypes = [
 		"red", "black", "higher", "lower", "same", "inside", "outside", "clubs",
@@ -290,7 +290,7 @@ Game.prototype.dealCards = function () {
 		for (let i = 0; i < cards.length; i++) {
 			const card = cards[i];
 			card.x = originX + i * margin;
-			card.y = 20 + player.y;
+			card.y = 35 + player.y;
 			cards[i] = card;
 		}
 	}

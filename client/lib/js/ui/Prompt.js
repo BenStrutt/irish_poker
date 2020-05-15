@@ -7,11 +7,11 @@ function Prompt(onSubmitCallback) {
 
 	this.x = 0;
 	this.y = 0;
-	this.width = 200;
-	this.height = 34;
+	this.width = 450;
+	this.height = 75;
 
 	this.text = "";
-	this.font = "30px Roboto, sans-serif";
+	this.font = "75px Roboto, sans-serif";
 	this.cursor = "|";
 
 	this.bgColor = "#888";
@@ -72,10 +72,10 @@ Prompt.prototype.process = function (deltaTime) {
 Prompt.prototype.render = function (renderer) {
 	renderer.font = this.font;
 	const currentWidth = renderer.measureText(this.text + this.cursor).width;
-	if (currentWidth > 200) {
+	if (currentWidth > 380) {
 		this.width = currentWidth;
 	} else {
-		this.width = 200;
+		this.width = 380;
 	}
 	const height = this.height;
 	const width = this.width;
@@ -98,6 +98,6 @@ Prompt.prototype.render = function (renderer) {
 	renderer.fillText(
 		text,
 		x,
-		y + 26,
+		y + 61,
 	);
 };

@@ -87,8 +87,8 @@ Lobby.prototype.renderPlayerList = function (renderer) {
 
 	this.lobbyPlayers.render(renderer);
 
-	const playerName = this.playerName
-	playerName.y = this.lobbyPlayers.y + 25;
+	const playerName = this.playerName;
+	playerName.y = this.lobbyPlayers.y + 45;
 	for (const id in players) {
 		const player = players[id];
 
@@ -96,7 +96,7 @@ Lobby.prototype.renderPlayerList = function (renderer) {
 
 		playerName.text = (player.name === null) ? "..." : player.name;
 		playerName.render(renderer);
-		playerName.y += 20;
+		playerName.y += 45;
 	}
 };
 
@@ -138,17 +138,17 @@ Lobby.prototype.initialize = function (data) {
 	prompt.position(width * 0.5, height * 0.5);
 
 	const lobbyPlayers = this.lobbyPlayers;
-	lobbyPlayers.position(width * 0.08, height * 0.035);
-	lobbyPlayers.style(25, "Roboto, sans-serif", "#FFF");
+	lobbyPlayers.position(width * 0.10, height * 0.035);
+	lobbyPlayers.style(50, "Roboto, sans-serif", "#FFF");
 	lobbyPlayers.text = "Players in lobby:";
 
 	const statusMessage = this.statusMessage;
 	statusMessage.position(width * 0.5, height * 0.5);
-	statusMessage.style(19, "Roboto, sans-serif", "#FFF");
+	statusMessage.style(40, "Roboto, sans-serif", "#FFF");
 
 	const playerName = this.playerName;
-	playerName.position(lobbyPlayers.x, lobbyPlayers.y + 25);
-	playerName.style(19, "Roboto, sans-serif", "#FFF");
+	playerName.position(lobbyPlayers.x, lobbyPlayers.y + 45);
+	playerName.style(40, "Roboto, sans-serif", "#FFF");
 };
 
 Lobby.prototype.canStartGame = function () {

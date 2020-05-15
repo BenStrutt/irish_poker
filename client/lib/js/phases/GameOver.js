@@ -126,9 +126,9 @@ GameOver.prototype.renderGuesses = function (renderer) {
 	const guesses = player.guesses;
 	const cards = player.cards;
 	for (let i = 0; i < guesses.length; i++) {
-		renderer.font = `17px Roboto, sans-serif`;
+		renderer.font = `30px Roboto, sans-serif`;
 		renderer.fillStyle = "#FFF";
 		renderer.textAlign = "center";
-		renderer.fillText(guesses[i], cards[i].x, cards[i].y - 40);
+		renderer.fillText(guesses[i], cards[i].x, cards[i].y - 85);
 	}
 };

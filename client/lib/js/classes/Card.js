@@ -8,10 +8,10 @@ function Card() {
 	this.height = 190;
 
 	this.angle = 0;
-	this.scaleX = 0.375;
-	this.scaleY = 0.375;
+	this.scaleX = 0.75;
+	this.scaleY = 0.75;
 
-	this.originScale = 0.375;
+	this.originScale = 0.75;
 
 	this.suit = "";
 	this.value = 0;

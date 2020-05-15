@@ -99,18 +99,18 @@ Player.prototype.reset = function () {
 
 Player.prototype.render = function (renderer) {
 	const nameDisplay = this.nameDisplay;
-	nameDisplay.position(this.x, this.y - 50);
-	nameDisplay.style(18, "Roboto, sans-serif", "#FFF");
+	nameDisplay.position(this.x, this.y - 125);
+	nameDisplay.style(32, "Roboto, sans-serif", "#FFF");
 	nameDisplay.text = this.name;
 	nameDisplay.render(renderer);
 
 	const uiText = this.uiText;
-	uiText.style(12, "Roboto, sans-serif", "#FFF")
+	uiText.style(25, "Roboto, sans-serif", "#FFF")
 
-	uiText.position(this.x, this.y - 34);
+	uiText.position(this.x, this.y - 95);
 	uiText.text = `Drinks to take: ${this.outstandingDrinks}`;
 	uiText.render(renderer);
-	uiText.position(this.x, this.y - 21);
+	uiText.position(this.x, this.y - 70);
 	uiText.text = `Total drinks: ${this.totalDrinks}`;
 	uiText.render(renderer);
 
