@@ -11,7 +11,7 @@ function Button(onPressCallback) {
 	this.scaleX = 1;
 	this.scaleY = 1;
 
-	this.color = "#d9a414";
+	this.color = undefined;
 	this.key = undefined;
 
 	this.text = undefined;
@@ -117,7 +117,7 @@ Button.prototype.render = function (renderer) {
 
 	const key = this.key;
 	if (key !== undefined) {
-		const image = assets.get(key);
+		const image = assets.getImage(key);
 		renderer.drawImage(image, -width * 0.5, -height * 0.5, width, height);
 	}
 

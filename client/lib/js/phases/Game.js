@@ -184,6 +184,9 @@ Game.prototype.receiveMessage = function (data) {
 };
 
 Game.prototype.initialize = function (data) {
+	this.data.round = data.round;
+	this.data.turn = data.turn;
+
 	this.setCards(data);
 	this.setSeats();
 	this.setState();
@@ -237,21 +240,21 @@ Game.prototype.setButtons = function () {
 
 	const buttons = this.buttons;
 
-	this.drinkButton.resize(80, 40);
-	this.drinkButton.setText("Take Drink");
+	this.drinkButton.key = "button_take_drink";
+	this.drinkButton.resize(201, 101);
 	this.drinkButton.position(width * 0.9, height * 0.05);
 
 	const buttonTypes = [
 		"red", "black", "higher", "lower", "same", "inside", "outside", "clubs",
 		"diamonds", "hearts", "spades",
-	]
+	];
 	for (let i = 0; i < buttonTypes.length; i++) {
 		const type = buttonTypes[i];
 		buttons[type] = new Button(
 			function () { this.sendMessage({type: "guess", guess: type}) }.bind(this)
 		)
-		buttons[type].resize(80, 40);
-		buttons[type].setText(type.charAt(0).toUpperCase() + type.slice(1));
+		buttons[type].key = "button_guess_" + type;
+		buttons[type].resize(201, 101);
 	}
 
 	buttons.red.position(width * 0.4, height * 0.5);

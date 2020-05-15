@@ -3,12 +3,43 @@
 function GameOver() {
 	this.playerNames = [];
 	this.currentPlayer = null;
+
+	this.playAgain = new Text();
+	this.yes = new Button(this.startGame.bind(this));
+	this.no = new Button();
 }
+
+GameOver.prototype.startGame = function () {
+	this.sendMessage({type: "start"});
+};
 
 GameOver.prototype.initialize = function () {
 	this.currentPlayer = this.data.players[this.data.id];
 	this.initializePlayerNames();
 	this.setCardPositions();
+
+	if (!this.canRestart()) { return; }
+
+	const width = this.data.world.Width;
+	const height = this.data.world.Height;
+
+	const playAgain = this.playAgain;
+	playAgain.text = "PLAY AGAIN?";
+	playAgain.style(25, "Roboto, sans-serif", "#FFF");
+	playAgain.position(width * 0.5, height * 0.4);
+
+	const yes = this.yes;
+	yes.color = "#080";
+	yes.resize(201, 101);
+	yes.setText("YES!", "25px Roboto, sans-serif");
+	yes.position(width * 0.5 - 100, height * 0.5);
+
+	const no = this.no;
+	no.color = "#800";
+	no.resize(201, 101);
+	no.setText("NO", "25px Roboto, sans-serif");
+	no.position(width * 0.5 + 100, height * 0.5);
+
 }
 
 GameOver.prototype.input = function (input) {
@@ -16,7 +47,16 @@ GameOver.prototype.input = function (input) {
 		const player = this.playerNames[i];
 		player.input(input, this.context);
 	}
+
+	if (!this.canRestart()) { return; }
+
+	this.yes.input(input);
+	this.no.input(input);
 };
+
+GameOver.prototype.canRestart = function () {
+	return this.data.id === 0;
+}
 
 GameOver.prototype.process = function () {
 
@@ -30,6 +70,14 @@ GameOver.prototype.render = function (renderer) {
 	this.renderStats(renderer);
 	this.renderCards(renderer);
 	this.renderGuesses(renderer);
+	this.renderPlayAgain(renderer);
+
+};
+
+GameOver.prototype.renderPlayAgain = function (renderer) {
+	this.playAgain.render(renderer);
+	this.yes.render(renderer);
+	this.no.render(renderer);
 };
 
 GameOver.prototype.initializePlayerNames = function () {

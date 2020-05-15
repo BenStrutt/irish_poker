@@ -1,27 +1,18 @@
 "use strict";
 
-// const World = {
-// 	Width: 640,
-// 	Height: 480,
-// };
-
-const width  = window.innerWidth || document.documentElement.clientWidth ||
-document.body.clientWidth;
-const height = window.innerHeight|| document.documentElement.clientHeight||
-document.body.clientHeight;
-
-console.log(width, height);
+const WIDTH = 1920;
+const HEIGHT = 1075;
 
 const World = {
-	Width: width - 25,
-	Height: height - 25,
+	Width: WIDTH,
+	Height: HEIGHT,
 };
 
 const canvas = document.createElement("canvas");
 const context = canvas.getContext("2d");
 
-canvas.width = World.Width;
-canvas.height = World.Height;
+canvas.width = WIDTH;
+canvas.height = HEIGHT;
 
 canvas.style.backgroundColor = "#000";
 
@@ -42,6 +33,20 @@ application.setPhase("game_over", new GameOver());
 application.phases.lobby.context = context;
 application.phases.game.context = context;
 application.phases.game_over.context = context;
+
+window.onload = resize;
+window.onresize = resize;
+
+function resize() {
+	const width = document.body.clientWidth;
+	const scale = width / WIDTH;
+	const height = HEIGHT * scale;
+
+	canvas.width = width;
+	canvas.height = height;
+
+	context.scale(scale, scale);
+}
 
 const flags = {
 	loaded: false,

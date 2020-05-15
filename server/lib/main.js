@@ -67,13 +67,15 @@ function receiveMessage(id, data) {
 			connection.broadcast(data);
 			break;
 		case "start":
-			game.phase = "game";
+			resetToGame();
 			dealCards();
 
 			connection.broadcast({
 				type: "change_phase",
 				value: "game",
-				players: game.players
+				players: game.players,
+				round: game.round,
+				turn: game.turn,
 			});
 			break;
 		case "guess":
@@ -200,4 +202,17 @@ const evaluateGuess = {
 		const card = game.players[game.turn].cards[3];
 		return guess === card.suit;
 	},
+}
+
+function resetToGame() {
+	game.phase = "game";
+	game.round = 1;
+	game.turn = 0;
+	game.deck.initialize();
+	const players = game.players;
+	for (const id in players) {
+		const player = players[id];
+		player.cards.length = 0;
+		player.guesses.length = 0;
+	}
 }

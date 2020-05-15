@@ -62,22 +62,22 @@ Lobby.prototype.renderWaitScreen = function (renderer) {
 		if (players[id].name === null) { allPlayersSet = false; }
 	}
 
-	let text;
-	if (!allPlayersSet) {
-		text = "Waiting for players to enter names";
-	} else {
-		if (this.canStartGame()) {
-			text = "Press start to begin";
+	if (!this.canStartGame()) {
+		let text;
+		if (!allPlayersSet) {
+			text = "Waiting for players to enter names";
 		} else {
-			const name = (players[0].name) ? players[0].name : "player 1";
-			text = `Waiting for ${name} to start game.`
+			if (this.canStartGame()) {
+				text = "Press start to begin";
+			} else {
+				const name = (players[0].name) ? players[0].name : "player 1";
+				text = `Waiting for ${name} to start game.`
+			}
 		}
+		this.statusMessage.text = text;
+		this.statusMessage.render(renderer);
+		return;
 	}
-
-	this.statusMessage.text = text;
-	this.statusMessage.render(renderer);
-
-	if (!this.canStartGame()) { return; }
 
 	this.button.render(renderer);
 };
@@ -129,9 +129,9 @@ Lobby.prototype.initialize = function (data) {
 	const height = world.Height;
 
 	const button = this.button;
-	button.position(width * 0.9, height * 0.05);
-	button.resize(80, 40);
-	button.setText("Start");
+	button.key = "button_start_game";
+	button.resize(201, 101);
+	button.position(width * 0.5, height * 0.5);
 
 	const prompt = this.prompt;
 	prompt.label = "Your name:";
