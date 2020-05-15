@@ -7,6 +7,8 @@ function Text(onPressCallback) {
 	this.x = null;
 	this.y = null;
 
+	this.alignment = "center";
+
 	this.size = null;
 	this.font = null;
 	this.color = null;
@@ -38,8 +40,16 @@ Text.prototype.input = function (inputEvents, context) {
 	const width = context.measureText(this.text).width;
 	const height = this.size;
 
-	const left = -width * 0.5;
-	const right = width * 0.5;
+	let left;
+	let right;
+	if (this.alignment = "center") {
+		left = -width * 0.5;
+		right = width * 0.5;
+	} else if (this.alignment = "left") {
+		left = 0;
+		right = width;
+	}
+
 	const top = -height * 0.5;
 	const bottom = height * 0.5;
 
@@ -65,7 +75,6 @@ Text.prototype.input = function (inputEvents, context) {
 				this.pressed = true;
 				this.scaleX = 1.2;
 				this.scaleY = 1.2;
-				this.color = "#fcec03"
 			}
 		}
 
@@ -106,7 +115,7 @@ Text.prototype.render = function (renderer) {
 	renderer.font = `${this.size}px ${this.font}`;
 	renderer.fillStyle = this.color;
 	renderer.textBaseline = "middle";
-	renderer.textAlign = "center";
+	renderer.textAlign = this.alignment;
 
 	renderer.fillText(this.text, 0, 0);
 

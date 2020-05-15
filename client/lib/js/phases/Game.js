@@ -50,26 +50,6 @@ Game.prototype.process = function (time) {
 		case "wait":
 			break;
 		case "reveal":
-			// in the following order:
-			// animate card flip.
-			// animate/show evaluation.
-			// when done animating, run the following code:
-			const player = this.data.players[this.data.turn];
-
-			if (player.isCorrect(this.data.round)) {
-				this.state = (this.data.turn === this.data.id) ? "give" : "receive";
-				player.drinksToGive = this.data.round * 2;
-			} else {
-				player.receiveDrinks(this.data.round);
-				this.data.turn++;
-				if (this.data.turn >= this.data.totalPlayers) {
-					this.data.turn = 0;
-					this.data.round++;
-					if (this.data.round > 4) { this.sendMessage({type: "end_game"}); return; }
-					this.dealCards();
-				}
-				this.setState();
-			}
 			break;
 		case "give":
 			break;
@@ -94,9 +74,7 @@ Game.prototype.render = function (renderer) {
 			this.statusMessage.render(renderer);
 			break;
 		case "reveal":
-			// const player = this.data.players[this.data.turn];
-			// const text = `${player.name} guessed ${player.guesses[game.round - 1]}`
-			// draw text to screen
+			this.statusMessage.render(renderer);
 			break;
 		case "give":
 			this.statusMessage.position(this.statusMessage.x, this.statusMessage.y - 10);
@@ -126,10 +104,59 @@ Game.prototype.receiveMessage = function (data) {
 			const cardIdx = localData.round - 1;
 			const card = player.cards[cardIdx];
 
-			card.deserialize(data.card);
+			card.deserialize(data.card)
+			card.faceDown = true;
 
 			player.guesses.push(data.guess);
 			this.state = "reveal";
+
+			this.statusMessage.text = "";
+
+			const originWidth = card.scaleX;
+			const originHeight = card.scaleY;
+			const originX = card.x;
+			const originY = card.y;
+			const scale = card.scaleX * 1.5;
+			tween.create(card)
+				.to({
+					x: this.data.world.Width * 0.5,
+					y: this.data.world.Height * 0.5,
+					scaleX: card.scaleX * 1.5,
+					scaleY: card.scaleY * 1.5,
+				}, 400)
+				.call(function () {
+					const player = this.data.players[this.data.turn];
+					const name = (this.data.turn === this.data.id) ? "You" : player.name;
+					this.statusMessage.position(this.statusMessage.x, this.statusMessage.y - 63);
+					this.statusMessage.text = `${name} chose ${player.guesses[this.data.round - 1]}!`
+				}.bind(this))
+				.wait(700)
+				.to({scaleX: 0}, 400)
+				.call(function () {
+					this.faceDown = !this.faceDown;
+				}.bind(card))
+				.to({scaleX: scale}, 400)
+				.call(function () {
+					const player = this.data.players[this.data.turn];
+					const name = (this.data.turn === this.data.id) ? "You" : player.name;
+					const plurality = (this.data.turn === this.data.id) ? "" : "s";
+					if (player.isCorrect(this.data.round)) {
+						this.statusMessage.text = `Correct! ${name} give${plurality} ${this.data.round * 2} drinks.`
+					} else {
+						this.statusMessage.text = `Wrong! ${name} take${plurality} ${this.data.round * 2} drinks.`
+					}
+				}.bind(this))
+				.wait(700)
+				.to({
+					x: originX,
+					y: originY,
+					scaleX: originWidth,
+					scaleY: originHeight,
+				}, 400)
+				.call(function () {
+					this.statusMessage.position(this.statusMessage.x, this.statusMessage.y + 63);
+				}.bind(this))
+				.call(this.guessEval.bind(this));
 			break;
 		case "receive_drink":
 			localData.players[localData.turn].drinksToGive--;
@@ -161,12 +188,13 @@ Game.prototype.initialize = function (data) {
 	this.setSeats();
 	this.setState();
 	this.setButtons();
+	this.setCardPositions();
 
 	const statusMessage = this.statusMessage;
 	const width = this.data.world.Width;
 	const height = this.data.world.Height;
 	statusMessage.position(width * 0.5, height * 0.5);
-	statusMessage.style(15, "Helvetica", "#FFF");
+	statusMessage.style(19, "Roboto, sans-serif", "#FFF");
 
 	for (const id in this.data.players) {
 		const player = this.data.players[id];
@@ -252,6 +280,50 @@ Game.prototype.dealCards = function () {
 	const players = this.data.players;
 	for (const id in players) {
 		const player = players[id];
-		player.cards.push(new Card());
+		const cards = player.cards;
+		cards.push(new Card());
+		const margin = 30; // 140 is card width
+		const originX = (-(cards.length - 1) * margin * 0.5) + player.x;
+		for (let i = 0; i < cards.length; i++) {
+			const card = cards[i];
+			card.x = originX + i * margin;
+			card.y = 20 + player.y;
+			cards[i] = card;
+		}
+	}
+};
+
+Game.prototype.guessEval = function () {
+	const player = this.data.players[this.data.turn];
+
+	if (player.isCorrect(this.data.round)) {
+		this.state = (this.data.turn === this.data.id) ? "give" : "receive";
+		player.drinksToGive = this.data.round * 2;
+	} else {
+		player.receiveDrinks(this.data.round);
+		this.data.turn++;
+		if (this.data.turn >= this.data.totalPlayers) {
+			this.data.turn = 0;
+			this.data.round++;
+			if (this.data.round > 4) { this.sendMessage({type: "end_game"}); return; }
+			this.dealCards();
+		}
+		this.setState();
+	}
+}
+
+Game.prototype.setCardPositions = function () {
+	const margin = 30; // 140 is card width
+
+	for (const id in this.data.players) {
+		const player = this.data.players[id];
+		const cards = player.cards;
+		const originX = (-(cards.length - 1) * margin * 0.5) + player.x;
+
+		for (let i = 0; i < cards.length; i++) {
+			const card = cards[i];
+			card.x = originX + i * margin;
+			card.y = 20 + player.y;
+		}
 	}
 };

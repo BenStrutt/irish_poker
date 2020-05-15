@@ -1,22 +1,23 @@
 "use strict"
 
-function Card(x, y) {
-	this.x = x;
-	this.y = y;
+function Card() {
+	this.x = null;
+	this.y = null;
 
 	this.width = 140;
 	this.height = 190;
 
 	this.angle = 0;
-	this.scaleX = 0.75;
-	this.scaleY = 0.75;
+	this.scaleX = 0.375;
+	this.scaleY = 0.375;
 
-	this.originScale = 0.75;
+	this.originScale = 0.375;
 
 	this.suit = "";
 	this.value = 0;
 
 	this.faceDown = true;
+	this.isAnimating = false;
 
 	this.transform = new DOMMatrix();
 }
@@ -112,13 +113,9 @@ Card.prototype.input = function (inputEvents) {
 			if (!this.pressed) { return; }
 			this.pressed = false;
 
-			if (isPointWithin) {
-				this.flip();
-			}
+			if (isPointWithin) {}
 		}
-
 	}
-
 };
 
 Card.prototype.flip = function () {

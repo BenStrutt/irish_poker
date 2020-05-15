@@ -70,9 +70,6 @@ function receiveMessage(id, data) {
 			game.phase = "game";
 			dealCards();
 
-			const cards = [];
-			for (const id in game.players) {cards.push(game.players[id].cards[0]);}
-
 			connection.broadcast({
 				type: "change_phase",
 				value: "game",

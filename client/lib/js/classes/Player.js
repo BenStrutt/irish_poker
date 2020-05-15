@@ -32,9 +32,14 @@ Player.prototype.deserialize = function(player) {
 
 Player.prototype.deserializeCards = function(player) {
 	const cards = []
+	const margin = 20; // 140 is card width
+	const originX = (-(cards.length - 1) * margin * 0.5) + player.x;
+
 	for (let i = 0; i < player.cards.length; i++) {
 		const card = new Card();
 		card.deserialize(player.cards[i]);
+		card.x = originX + i * margin;
+		card.y = 20 + player.y;
 		cards[i] = card;
 	}
 
@@ -94,38 +99,26 @@ Player.prototype.reset = function () {
 
 Player.prototype.render = function (renderer) {
 	const nameDisplay = this.nameDisplay;
-	nameDisplay.position(this.x, this.y - 55);
-	nameDisplay.style(16, "Helvetica", "#FFF");
+	nameDisplay.position(this.x, this.y - 50);
+	nameDisplay.style(18, "Roboto, sans-serif", "#FFF");
 	nameDisplay.text = this.name;
 	nameDisplay.render(renderer);
 
 	const uiText = this.uiText;
-	uiText.style(11, "Helvetica", "#FFF")
+	uiText.style(12, "Roboto, sans-serif", "#FFF")
 
-	uiText.position(this.x, this.y - 43);
+	uiText.position(this.x, this.y - 34);
 	uiText.text = `Drinks to take: ${this.outstandingDrinks}`;
 	uiText.render(renderer);
-	uiText.position(this.x, this.y - 33);
+	uiText.position(this.x, this.y - 21);
 	uiText.text = `Total drinks: ${this.totalDrinks}`;
 	uiText.render(renderer);
 
-	renderer.save();
-
-	renderer.translate(this.x, this.y);
-	renderer.rotate(this.angle);
-	renderer.scale(this.scaleX, this.scaleY);
-
 	const cards = this.cards;
-	const margin = 30; // 140 is card width
-	const originX = -(cards.length - 1) * margin * 0.5;
 	for (let i = 0; i < cards.length; i++) {
 		const card = cards[i];
-		card.x = originX + i * margin;
-		card.y = 20;
 		card.render(renderer);
 	}
-
-	renderer.restore();
 };
 
 Player.prototype.input = function (inputEvents) {

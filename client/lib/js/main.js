@@ -1,8 +1,20 @@
 "use strict";
 
+// const World = {
+// 	Width: 640,
+// 	Height: 480,
+// };
+
+const width  = window.innerWidth || document.documentElement.clientWidth ||
+document.body.clientWidth;
+const height = window.innerHeight|| document.documentElement.clientHeight||
+document.body.clientHeight;
+
+console.log(width, height);
+
 const World = {
-	Width: 640,
-	Height: 480,
+	Width: width - 25,
+	Height: height - 25,
 };
 
 const canvas = document.createElement("canvas");
@@ -40,13 +52,11 @@ const flags = {
 const INPUT = [];
 document.addEventListener("keydown", (e) => {
 	flags.touched = true;
-	startMusic();
 	INPUT.push({type: "keydown", keyCode: e.keyCode, key: e.key});
 });
 
 document.addEventListener("mousedown", (e) => {
 	flags.touched = true;
-	startMusic();
 	INPUT.push({type: "mousedown", x: e.offsetX, y: e.offsetY});
 });
 
@@ -71,7 +81,6 @@ function startMusic() {
 
 function startGame() {
 	flags.loaded = true;
-	startMusic();
 	loop.run();
 }
 

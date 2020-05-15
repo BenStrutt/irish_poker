@@ -29,7 +29,7 @@ Application.prototype.setPhase = function (key, phase) {
 
 	if (this.phase !== key) { return; }
 
-	phase.initialize({});
+	phase.initialize();
 
 };
 

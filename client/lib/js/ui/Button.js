@@ -123,7 +123,7 @@ Button.prototype.render = function (renderer) {
 
 	const text = this.text;
 	if (text !== undefined) {
-		const font = this.font === undefined ? "bold 15px Helvetica" : this.font;
+		const font = this.font === undefined ? "15px Roboto, sans-serif" : this.font;
 		renderer.font = font;
 
 		renderer.textBaseline = "middle";

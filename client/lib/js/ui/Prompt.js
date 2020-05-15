@@ -11,7 +11,7 @@ function Prompt(onSubmitCallback) {
 	this.height = 34;
 
 	this.text = "";
-	this.font = "30px Helvetica";
+	this.font = "30px Roboto, sans-serif";
 	this.cursor = "|";
 
 	this.bgColor = "#888";
@@ -51,10 +51,10 @@ Prompt.prototype.input = function (inputEvents) {
 				this.text = current.slice(0, -1);
 			}
 		} else if (keyCode === 32 || keyCode >= 65 && keyCode <= 90) {
-			if (current.length < 40) { this.text += input.key; };
+			if (current.length < 20) { this.text += input.key; };
 		} else if (keyCode === 13) {
 			if (this.text === "") { return; }
-			
+
 			this.onSubmit(this.text);
 			this.text = "";
 		}

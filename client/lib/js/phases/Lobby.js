@@ -138,17 +138,17 @@ Lobby.prototype.initialize = function (data) {
 	prompt.position(width * 0.5, height * 0.5);
 
 	const lobbyPlayers = this.lobbyPlayers;
-	lobbyPlayers.position(width * 0.15, height * 0.035);
-	lobbyPlayers.style(18, "Helvetica", "#FFF");
+	lobbyPlayers.position(width * 0.08, height * 0.035);
+	lobbyPlayers.style(25, "Roboto, sans-serif", "#FFF");
 	lobbyPlayers.text = "Players in lobby:";
 
 	const statusMessage = this.statusMessage;
 	statusMessage.position(width * 0.5, height * 0.5);
-	statusMessage.style(15, "Helvetica", "#FFF");
+	statusMessage.style(19, "Roboto, sans-serif", "#FFF");
 
 	const playerName = this.playerName;
 	playerName.position(lobbyPlayers.x, lobbyPlayers.y + 25);
-	playerName.style(15, "Helvetica", "#FFF");
+	playerName.style(19, "Roboto, sans-serif", "#FFF");
 };
 
 Lobby.prototype.canStartGame = function () {
