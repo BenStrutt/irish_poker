@@ -168,7 +168,7 @@ Game.prototype.receiveMessage = function (data) {
 				if (localData.turn >= localData.totalPlayers) {
 					localData.turn = 0;
 					localData.round++;
-					if (localData.round > 4 && localData.id === 0) {
+					if (localData.round > 4) {
 						this.sendMessage({type: "end_game"});
 						return;
 					}

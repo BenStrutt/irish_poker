@@ -116,7 +116,11 @@ function receiveMessage(id, data) {
 				if (game.turn >= game.totalPlayers) {
 					game.turn = 0;
 					game.round++;
-					if (game.round > 4) { game.phase = "game_over"; return; }
+					if (game.round > 4) {
+						game.phase = "game_over";
+						connection.broadcast({type: "receive_drink", id: data.id});
+						return;
+					}
 					dealCards();
 				}
 			}
