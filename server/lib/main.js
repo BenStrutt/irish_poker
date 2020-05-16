@@ -14,7 +14,7 @@ const game = {
 	deck: new Deck(),
 };
 
-const connection = new Connection("localhost", 8080);
+const connection = new Connection("localhost", 9000);
 connection.connect = connect;
 connection.disconnect = disconnect;
 connection.reconnect = connect;

@@ -23,7 +23,7 @@ const POSITIONS = [
 	{x: 0.1, y: 0.25}, // left upper 6
 	{x: 0.1, y: 0.75}, // left lower 7
 	{x: 0.9, y: 0.25}, // right upper 8
-	{x: 0.1, y: 0.75}, // right lower 9
+	{x: 0.9, y: 0.75}, // right lower 9
 ];
 
 function getSeatPosition(seat, seats) {

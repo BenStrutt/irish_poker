@@ -220,8 +220,8 @@ Game.prototype.setSeats = function () {
 	const seats = this.data.totalPlayers;
 
 	for (const id in players) {
-		const player = players[id];
-		const position = getSeatPosition((local + Number(id)) % seats, seats);
+		const player = players[(local + Number(id)) % seats];
+		const position = getSeatPosition(id, seats);
 		player.x = position.x * world.Width;
 		player.y = position.y * world.Height;
 	}

@@ -22,7 +22,7 @@ const assets = new Assets();
 assets.load(ASSET_DATA, startGame);
 
 const application = new Application("lobby");
-application.setConnection(new Connection("localhost", 8080));
+application.setConnection(new Connection("localhost", 9000));
 application.setAssets(assets);
 application.setWorld(World);
 
