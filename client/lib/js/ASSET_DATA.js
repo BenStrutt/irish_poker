@@ -17,6 +17,9 @@ const ASSET_DATA = {
 	button_take_drink: "button_take_drink.png",
 
 	table: "table.png",
+	table_green: "table_green.png",
+	table_yellow: "table_yellow.png",
+
 	cardBack_blue1: "cardBack_blue1.png",
 	cardBack_blue2: "cardBack_blue2.png",
 	cardBack_blue3: "cardBack_blue3.png",

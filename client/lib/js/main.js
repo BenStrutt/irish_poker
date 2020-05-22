@@ -102,7 +102,12 @@ const loop = {
 
 		tween.update(deltaTime);
 
-		context.drawImage(assets.getImage("table"), 0, 0, World.Width, World.Height);
+		const c = Math.ceil(WIDTH / 100);
+		const r = Math.ceil(HEIGHT / 100);
+
+		for (let i = 0; i < c * r; i++) {
+			context.drawImage(assets.getImage("table_green"), i % c * 100, Math.floor(i / c) * 100, 100, 100);
+		}
 		application.render(context);
 
 		INPUT.length = 0;
